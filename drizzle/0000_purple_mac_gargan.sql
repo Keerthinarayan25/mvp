@@ -10,10 +10,11 @@ CREATE TABLE "application" (
 --> statement-breakpoint
 CREATE TABLE "developer_profiles" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer,
+	"user_id" integer NOT NULL,
 	"bio" text,
 	"skills" text,
 	"tech_stack" text,
+	"portfolio_links" text,
 	"pricing_model" varchar(50),
 	"availability" varchar(50)
 );
@@ -32,10 +33,12 @@ CREATE TABLE "projects" (
 CREATE TABLE "users" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" varchar(100) NOT NULL,
+	"email" varchar(150) NOT NULL,
 	"password" varchar(255) NOT NULL,
 	"role" "role" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
-	CONSTRAINT "users_name_unique" UNIQUE("name")
+	CONSTRAINT "users_name_unique" UNIQUE("name"),
+	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 ALTER TABLE "application" ADD CONSTRAINT "application_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

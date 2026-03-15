@@ -28,7 +28,7 @@ export default function LoginPage(){
 
     const userRes = await fetch("/api/auth/me");
     const user = await userRes.json();
-
+    console.log("Login details:",user);
     if (user.role === "developer") {
       router.push("/developer/dashboard");
     } else {
@@ -55,7 +55,7 @@ export default function LoginPage(){
         />
 
         <input 
-          type="pasword"
+          type="password"
           placeholder="Password"
           className="w-full border p-2 rounded"
           onChange={(e) =>

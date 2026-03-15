@@ -40,7 +40,8 @@ export default function RegisterPage() {
 
         <input
           type="text"
-          placeholder="w-full border p-2 rounded"
+          placeholder="Name"
+          className="w-full border p-2 rounded"
           onChange={(e) =>
             setForm({ ...form, name: e.target.value })
           }

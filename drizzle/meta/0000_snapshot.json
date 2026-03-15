@@ -1,5 +1,5 @@
 {
-  "id": "75413d4a-7771-40f0-8641-4af07ebcc337",
+  "id": "b01e76e9-307c-49ca-bfde-2ccf9d09d264",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -96,7 +96,7 @@
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "bio": {
           "name": "bio",
@@ -112,6 +112,12 @@
         },
         "tech_stack": {
           "name": "tech_stack",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "portfolio_links": {
+          "name": "portfolio_links",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -244,6 +250,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "email": {
+          "name": "email",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "password": {
           "name": "password",
           "type": "varchar(255)",
@@ -274,6 +286,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "name"
+          ]
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
           ]
         }
       },

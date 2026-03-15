@@ -13,10 +13,11 @@ export const users = pgTable("users",{
 
 export const developerProfiles = pgTable("developer_profiles",{
   id:serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id).notNull(),
   bio: text("bio"),
   skills: text("skills"),
   techStack: text("tech_stack"),
+  portfolioLinks: text("portfolio_links"),
   pricingModel: varchar("pricing_model",{length:50}),
   availability: varchar("availability",{length:50}),
 
