@@ -38,38 +38,37 @@ export default function LoginPage(){
   }
 
   return(
-    <div className="felx h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <form
         onSubmit={handleLogin}
-        className="space-y-4 p-8 shadow-lg rounded-lg w-96"
+        className="space-y-4 p-8 shadow-lg rounded-lg w-96 bg-white"
       >
         <h1 className="text-2xl font-bold text-center">Login</h1>
 
-        <input 
+        <input
           type="email"
           placeholder="Email"
           className="w-full border p-2 rounded"
-          onChange={(e) => 
-            setForm({...form,email:e.target.value})
+          onChange={(e) =>
+            setForm({ ...form, email: e.target.value })
           }
         />
 
-        <input 
+        <input
           type="password"
           placeholder="Password"
           className="w-full border p-2 rounded"
           onChange={(e) =>
-            setForm({...form, password:e.target.value})
+            setForm({ ...form, password: e.target.value })
           }
         />
 
-        <button 
+        <button
           type="submit"
-          className="w-full bg-black text-white p-2 rounded"
+          className="w-full bg-black text-white p-2 rounded hover:bg-gray-800"
         >
           Login
         </button>
-
       </form>
     </div>
   )
