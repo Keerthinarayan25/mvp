@@ -10,7 +10,7 @@ export default function CreateprojectPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    bugetRange: "",
+    budgetRange: "",
     timeline: "",
     techStack: "",
   })
@@ -59,7 +59,7 @@ export default function CreateprojectPage() {
           placeholder="Budget"
           className="w-full border p-2"
           onChange={(e) =>
-            setForm({ ...form, bugetRange: e.target.value })
+            setForm({ ...form, budgetRange: e.target.value })
           } 
         />
 

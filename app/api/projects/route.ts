@@ -11,7 +11,9 @@ export async function GET() {
     const allProjects = await db
       .select()
       .from(projects)
-      .where(eq(projects.status, "open"))
+      .where(eq(projects.status, "open"));
+
+    console.log("Route of projects list",allProjects);
 
     return NextResponse.json(allProjects)
 
