@@ -15,6 +15,13 @@
       "when": 1773654143386,
       "tag": "0001_previous_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774517882893,
+      "tag": "0002_absurd_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }

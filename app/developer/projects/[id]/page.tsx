@@ -17,11 +17,38 @@ export default function ProjectDetailPage() {
   const { id } = useParams();
   const [project, setproject] = useState<Project | null>(null);
 
+  const [proposal, setProposal] = useState("");
+  const [price, setPrice] = useState("");
+  const [delivery, setDelivery] = useState("");
+
   useEffect(() => {
     fetch(`/api/projects/${id}`)
       .then(res => res.json())
       .then(data => setproject(data))
   }, [id])
+
+  const handleApply = async (e: React.SyntheticEvent<HTMLElement>) => {
+    e.preventDefault()
+
+    const res = await fetch("/api/applications", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        projectId: id,
+        proposalMessage: proposal,
+        proposedPrice: price,
+        deliveryTime: delivery,
+      }),
+    })
+
+    if (res.ok) {
+      alert("Proposal submitted ✅")
+    } else {
+      alert("Failed to apply")
+    }
+  }
 
   if (!project) {
     return <div className="p-18">Loading...</div>
@@ -32,6 +59,11 @@ export default function ProjectDetailPage() {
       <h1 className="text-3xl font-bold">
         {project.title}
       </h1>
+
+      <h2 className="font-semibold">Project Description</h2>
+      <p className="text-gray-700 mt-2">
+        {project.description}
+      </p>
       <div className="flex gap-6 text-gray-600">
         <span>💰 Budget: {project.budgetRange}</span>
         <span>⏳ Timeline: {project.timeline}</span>
@@ -42,21 +74,36 @@ export default function ProjectDetailPage() {
         <p>{project.techStack}</p>
       </div>
 
-      <div>
-        <h2 className="font-semibold">Project Description</h2>
-        <p className="text-gray-700 mt-2">
-          {project.description}
-        </p>
-      </div>
-
-      <div>
-        <h2 className="text-xl font-semibold">
-          Apply for this project
+      <div className="border-t pt-6">
+        <h2 className="text-xl font-semibold mb-4">
+          Submit proposal
         </h2>
 
-        <p className="text-gray-500">
-          (Proposal form)
-        </p>
+        <form onSubmit={handleApply} className="space-y-4">
+
+          <textarea
+            placeholder="write your proposal (cover letter)"
+            className="w-full border p-2"
+            onChange={(e) => setProposal(e.target.value)}
+          />
+
+          <textarea
+            placeholder="Your Price (e.g. $2500"
+            className="w-full border p-2"
+            onChange={(e) => setPrice(e.target.value)}
+          />
+
+          <textarea
+            placeholder="Delivery Time (e.g. 21 Days"
+            className="w-full border p-2"
+            onChange={(e) => setDelivery(e.target.value)}
+          />
+
+          <button className="bg-black text-white px-4 py-2">
+            Submit Proposal
+          </button>
+
+        </form>
       </div>
     </div>
   )

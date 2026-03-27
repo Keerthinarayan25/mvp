@@ -38,8 +38,8 @@ export const projects = pgTable("projects",{
 
 export const applications = pgTable("application",{
   id:serial("id").primaryKey(),
-  projectId: integer("project_id").references(() => projects.id),
-  developerId: integer("developer_id").references(()=> users.id),
+  projectId: integer("project_id").references(() => projects.id).notNull(),
+  developerId: integer("developer_id").references(()=> users.id).notNull(),
   proposalMessage: text("proposal_message"),
   proposedPrice: varchar("proposed_price", { length: 100 }),
   deliveryTime: varchar("delivery_time", { length: 100 }),
