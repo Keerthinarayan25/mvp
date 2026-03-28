@@ -44,7 +44,7 @@ export default function Navbar(){
           <>
           <Link href="/founder/dashboard">Dashboard</Link>
           <Link href="/founder/projects">My Projects</Link>
-          <Link href="/founder/profile/create">Post Project</Link>
+          <Link href="/founder/profile/create">Profile</Link>
           </>
         )}
       </div>

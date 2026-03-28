@@ -36,7 +36,7 @@ export default function ProjectDetailPage() {
         "Content-type": "application/json",
       },
       body: JSON.stringify({
-        projectId: id,
+        projectId: Number(id),
         proposalMessage: proposal,
         proposedPrice: price,
         deliveryTime: delivery,

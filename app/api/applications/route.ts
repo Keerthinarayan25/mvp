@@ -19,17 +19,18 @@ export async function POST(req: NextRequest) {
     const user = verifyToken(token);
     const body = await req.json();
 
+    console.log("Application poject ID:", body.project_id)
     const newApplication = await db
       .insert(applications)
       .values({
-        projectId: body.project_id,
+        projectId: Number(body.projectId),
         developerId: user.id,
         proposalMessage: body.proposalMessage,
         proposedPrice: body.proposedPrice,
-        deliveryTime: body.delivery_time,
+        deliveryTime: body.deliveryTime,
       })
       .returning()
-
+    
     return NextResponse.json(newApplication);
 
   } catch (error) {

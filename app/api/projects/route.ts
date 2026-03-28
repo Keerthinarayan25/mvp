@@ -5,8 +5,31 @@ import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET() {
+export async function GET(req:NextRequest) {
   try {
+
+    const url = new URL(req.url);
+    const mine = url.searchParams.get("mine");
+
+    if(mine === "mine"){
+      const token = req.cookies.get("token")?.value;
+      
+      if(!token) {
+        return NextResponse.json(
+          { error: "Unauthorized"},
+          { status: 401}
+        )
+      }
+      
+      const user = verifyToken(token);
+      const myProjects = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.founderId, user.id))
+
+      return NextResponse.json(myProjects);
+
+    }
 
     const allProjects = await db
       .select()

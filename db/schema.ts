@@ -4,6 +4,7 @@ export const roleEnum = pgEnum("role",["developer","founder"]);
 
 export const users = pgTable("users",{
   id: serial("id").primaryKey(),
+  // profileImage: text("profile_image")
   name: varchar("name",{length:100}).notNull().unique(),
   email: varchar("email", { length: 150 }).notNull().unique(),
   password: varchar("password",{length:255}).notNull(),
