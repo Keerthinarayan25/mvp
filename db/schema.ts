@@ -55,7 +55,7 @@ export  const contracts = pgTable("contracts",{
   founderId: integer("founder_id").references(() => users.id).notNull(),
   agreedprice: varchar("agreed_price",{length: 100}),
   deadline: varchar("deadline", {length:100}),
-  status: varchar("status", {length: 50}),
+  status: varchar("status", {length: 50}).default("active"),
   createdAt: timestamp("created_at").defaultNow(),
 
 })

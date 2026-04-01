@@ -29,6 +29,13 @@
       "when": 1774612323575,
       "tag": "0003_whole_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774763122994,
+      "tag": "0004_flowery_stingray",
+      "breakpoints": true
     }
   ]
 }

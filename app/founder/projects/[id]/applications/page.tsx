@@ -6,13 +6,14 @@ import { useEffect, useState } from "react";
 
 
 interface Application {
-  applicationId: string,
+  applicationId: number,
   proposalMessage: string,
   proposedPrice: number,
   deliveryTime: string,
   developerId: string,
   developerName: string,
-  profileImage: string | null
+  profileImage: string | null,
+  status?: string
 }
 
 export default function ApplicationsPage() {
@@ -29,6 +30,25 @@ export default function ApplicationsPage() {
         setApplications(data)
       })
   }, [id])
+
+  const handleAccept = async (applicationId: number) => {
+    const res = await fetch(`/api/applications/${applicationId}`, {
+      method: "POST"
+    })
+
+    if (res.ok) {
+      setApplications(prev =>
+        prev.map(app => ({
+          ...app,
+          status: app.applicationId === applicationId
+            ? "Accepted"
+            : "Rejected"
+        }))
+      )
+    } else {
+      alert("Failed to accept");
+    }
+  }
 
   return (
     <div className="max-w-3xl mx-auto mt-10 space-y-6">
@@ -79,12 +99,32 @@ export default function ApplicationsPage() {
           </p>
 
           <div className="flex gap-3">
-            <button className="bg-green-600 text-white px-3 py-1 rounded">
-              Accept
-            </button>
-            <button className="bg-red-500 text-white px-3 py-1 rounded">
-              Reject
-            </button>
+
+            {app.status === "Accepted" ? (
+              <span className="text-green-600 font-semibold">
+                Developer Selected
+              </span>
+            ) : app.status === "Rejected" ? (
+              <span className="text-gray-400">
+                Rejected
+              </span>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleAccept(app.applicationId)}
+                  className="bg-green-600 text-white px-3 py-1 rounded"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handleAccept(app.applicationId)}
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+
           </div>
 
         </div>
