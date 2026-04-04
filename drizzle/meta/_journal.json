@@ -36,6 +36,13 @@
       "when": 1774763122994,
       "tag": "0004_flowery_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775320124136,
+      "tag": "0005_vengeful_gladiator",
+      "breakpoints": true
     }
   ]
 }
