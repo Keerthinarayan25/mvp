@@ -36,7 +36,7 @@ export default function Navbar(){
           <>
           <Link href="/developer/dashboard">Dashboard</Link>
           <Link href="/developer/projects">Projects</Link>
-          <Link href="/developer/profile/view">Profile</Link>
+          <Link href={`/developer/profile/view/${user.id}`}>Profile</Link>
           </>
         )}
 

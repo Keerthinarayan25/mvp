@@ -64,7 +64,7 @@ export default function ApplicationsPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image
-                src={"/keerthi narayan M.jpg"}
+                src={"/keerthinarayan M.jpg"}
                 width={50}
                 height={50}
                 alt="profile"
