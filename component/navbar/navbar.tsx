@@ -34,6 +34,7 @@ export default function Navbar(){
 
         {user?.role === "developer" && (
           <>
+          <Link href="/developer/contracts">My Work</Link>
           <Link href="/developer/dashboard">Dashboard</Link>
           <Link href="/developer/projects">Projects</Link>
           <Link href={`/developer/profile/view/${user.id}`}>Profile</Link>
@@ -42,6 +43,7 @@ export default function Navbar(){
 
         {user?.role === "founder" && (
           <>
+          <Link href="/founder/contracts">Contracts</Link>
           <Link href="/founder/dashboard">Dashboard</Link>
           <Link href="/founder/projects">My Projects</Link>
           <Link href="/founder/profile/create">Profile</Link>
