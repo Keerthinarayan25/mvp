@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 
 interface Message {
@@ -17,70 +17,127 @@ export default function ContractPage() {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  const bottomRef = useRef<HTMLDivElement | null>(null);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!id) return;
-    const res = await fetch(`/api/contracts/${id}`);
-    const data = await res.json();
-    setMessages(data);
-  }
+
+    try {
+      const res = await fetch(`/api/contracts/${id}`);
+
+      if (!res.ok) return;
+      const data: Message[] = await res.json();
+
+      setMessages((prev) => {
+        if (prev.length === data.length && prev[prev.length - 1]?.id === data[data.length - 1]?.id) {
+          return prev;
+        }
+        return data;
+      });
+      setLoading(false);
+    } catch {
+
+    }
+  }, [id]);
+
 
   useEffect(() => {
     fetchMessages();
 
     const interval = setInterval(() => {
-      fetchMessages();
-    }, 2000)
+      if (document.visibilityState === "visible") {
+        fetchMessages();
+      }
+    }, 3000)
     return () => clearInterval(interval);
-  }, [id])
+  }, [fetchMessages])
 
   useEffect(() => {
     fetch("/api/auth/me")
       .then(res => res.json())
       .then(user => setCurrentUserId(user.id))
+      .catch(() => { });
   }, [])
 
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
 
   const sendMessage = async () => {
+    const trimmed = text.trim();
+    if (!trimmed || sending) return;
 
-    if (!text.trim()) return;
-    await fetch("/api/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        contractId: id,
-        messageText: text,
-      })
-    })
+    setSending(true);
 
+    const tempMessage: Message = {
+      id: Date.now(),
+      text: trimmed,
+      senderId: currentUserId || 0,
+      senderName: "You",
+      createdAt: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, tempMessage]);
     setText("");
-    fetchMessages();
-  }
 
+    try {
+
+      await fetch("/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contractId: id,
+          messageText: text,
+        }),
+      });
+
+      fetchMessages();
+    } catch {
+      setMessages((prev) => prev.slice(0, -1));
+      setText(trimmed);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") sendMessage();
+  };
+
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
   return (
-    <div className="max-w-3xl mx-auto mt-10">
+    <div className="max-w-3xl mx-auto mt-10 flex flex-col h-[80vh] border rounded-lg shadow">
 
-      <h1 className="text-xl font-bold mb-4">
-        Contract Workspace
-      </h1>
+      <div className="p-4 border-b bg-white">
+        <h1 className="text-xl font-semibold">
+          Contract Workspace #{id}
+        </h1>
+      </div>
 
       {/* Messages */}
-      <div className="border p-4 h-96 overflow-y-auto bg-gray-100 rounded">
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-100 space-y-3">
 
-        <div className="flex flex-col gap-2">
-
-          {messages.map(msg => {
-
+        {loading ? (
+          <p>Loading...</p>
+        ) : messages.length === 0 ? (
+          <p>
+            No Message Yet
+          </p>
+        ) : (
+          messages.map(msg => {
             const isMe = msg.senderId === currentUserId;
 
             return (
@@ -88,12 +145,12 @@ export default function ContractPage() {
                 key={msg.id}
                 className={`flex ${isMe ? "justify-end" : "justify-start"}`}
               >
-
                 <div
                   className={`max-w-xs px-3 py-2 rounded-lg
-                  ${isMe
+                    ${isMe
                       ? "bg-black text-white"
-                      : "bg-white border"}`}
+                      : "bg-white border"
+                    }`}
                 >
                   {!isMe && (
                     <p className="text-xs font-semibold">
@@ -104,31 +161,26 @@ export default function ContractPage() {
                   <p>
                     {msg.text}
                   </p>
-                  <p className="text-[10px] text-gray-400 mt-1">
-                    {new Date(msg.createdAt).toLocaleTimeString()}
+                  <p className="text-[10px] mt-1 opacity-70 text-right">
+                    {formatTime(msg.createdAt)}
                   </p>
                 </div>
-
               </div>
-            )
+            );
+          })
+        )}
 
-          })}
-
-          <div ref={bottomRef} />
-        </div>
-
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="flex gap-2 mt-4">
+
+      <div className="p-3 border-t bg-white flex gap-2">
 
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => {
-            if(e.key === "Enter") sendMessage();
-          }}
-          className="border p-2 flex-1 rounded"
+          onKeyDown={handleKeyDown}
+          className="flex-1 border rounded px-3 py-2"
           placeholder="Type message..."
         />
 
@@ -145,7 +197,7 @@ export default function ContractPage() {
 
       </div>
 
-    </div>
+    </div >
 
   )
 }
