@@ -5,57 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1773069618318,
-      "tag": "0000_purple_mac_gargan",
+      "when": 1777364689235,
+      "tag": "0000_sparkling_landau",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1773654143386,
-      "tag": "0001_previous_ben_urich",
+      "when": 1777365923750,
+      "tag": "0001_sleepy_patch",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1774517882893,
-      "tag": "0002_absurd_pete_wisdom",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1774612323575,
-      "tag": "0003_whole_iron_lad",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1774763122994,
-      "tag": "0004_flowery_stingray",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1775320124136,
-      "tag": "0005_vengeful_gladiator",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1776856115238,
-      "tag": "0006_dizzy_pixie",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1777360764251,
-      "tag": "0007_overconfident_sue_storm",
+      "when": 1777366131923,
+      "tag": "0002_calm_human_cannonball",
       "breakpoints": true
     }
   ]

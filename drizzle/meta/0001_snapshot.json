@@ -1,6 +1,6 @@
 {
-  "id": "92f32cc2-cd18-44a4-8c94-65a7b1cf641c",
-  "prevId": "b01e76e9-307c-49ca-bfde-2ccf9d09d264",
+  "id": "f100a2e1-3578-4fda-a247-81fd3df83f64",
+  "prevId": "412625c6-1586-4004-86ad-808bda5892a5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -18,13 +18,13 @@
           "name": "project_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "developer_id": {
           "name": "developer_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "proposal_message": {
           "name": "proposal_message",
@@ -138,7 +138,8 @@
           "name": "status",
           "type": "varchar(50)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'active'"
         },
         "created_at": {
           "name": "created_at",
@@ -220,19 +221,13 @@
         },
         "skills": {
           "name": "skills",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "tech_stack": {
-          "name": "tech_stack",
-          "type": "text",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },
         "portfolio_links": {
           "name": "portfolio_links",
-          "type": "text",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },
@@ -247,6 +242,49 @@
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "education": {
+          "name": "education",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "languages": {
+          "name": "languages",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github": {
+          "name": "github",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "linkedin": {
+          "name": "linkedin",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_image": {
+          "name": "profile_image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -328,6 +366,69 @@
           "tableTo": "users",
           "columnsFrom": [
             "sender_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.portfolios": {
+      "name": "portfolios",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "developer_id": {
+          "name": "developer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "project_link": {
+          "name": "project_link",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "github_link": {
+          "name": "github_link",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "portfolios_developer_id_users_id_fk": {
+          "name": "portfolios_developer_id_users_id_fk",
+          "tableFrom": "portfolios",
+          "tableTo": "users",
+          "columnsFrom": [
+            "developer_id"
           ],
           "columnsTo": [
             "id"

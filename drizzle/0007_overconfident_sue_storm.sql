@@ -1,1 +1,0 @@
-ALTER TABLE "developer_profiles" DROP COLUMN "tech_stack";

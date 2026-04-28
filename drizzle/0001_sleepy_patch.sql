@@ -1,0 +1,1 @@
+ALTER TABLE "portfolios" ALTER COLUMN "description" SET NOT NULL;
