@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 
-export async function POST(req: NextRequest){
+export async function PATCH(req: NextRequest){
   try{
     const token = req.cookies.get("token")?.value;
 
@@ -27,7 +27,9 @@ export async function POST(req: NextRequest){
     .set({
       bio: body.bio,
       skills: body.skills,
-      techStack: body.techStack,
+      languages: body.languages,
+      github: body.github,
+      linkedin: body.linkedin,
       profileImage: body.profileImage,      
     })
     .where(eq(developerProfiles.userId, user.id))

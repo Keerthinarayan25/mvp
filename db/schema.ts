@@ -16,17 +16,17 @@ export const developerProfiles = pgTable("developer_profiles", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   bio: text("bio"),
-  skills: text("skills"),
-  techStack: text("tech_stack"),
-  portfolioLinks: text("portfolio_links"),
+  skills: text("skills").array(),
+  portfolioLinks: text("portfolio_links").array(),
   pricingModel: varchar("pricing_model", { length: 50 }),
   availability: varchar("availability", { length: 50 }),
   category: varchar("category", { length: 100 }),
   education: text("education"),
-  languages: text("languages"),
+  languages: text("languages").array(),
   github: varchar("github", { length: 255 }),
   linkedin: varchar("linkedin", { length: 255 }),
   profileImage: text("profile_image"),
+  createdAt: timestamp("created_at").defaultNow(),
 
 });
 

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -22,7 +22,7 @@ interface ProfileData {
   }
   profile: {
     bio: string
-    skills: string
+    skills: string[]
     category: string
     github: string
     linkedin: string
@@ -34,7 +34,8 @@ interface ProfileData {
 
 export default function DeveloperProfilePage() {
 
-  const { id } = useParams()
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
   const [data, setData] = useState<ProfileData | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -42,8 +43,18 @@ export default function DeveloperProfilePage() {
 
   const fetchProfile = async () => {
     const res = await fetch(`/api/profile?id=${id}`);
-    const result = await res.json();
-    setData(result);
+
+    console.log("STATUS:", res.status);
+
+    const text = await res.text();   // 👈 IMPORTANT
+    console.log("RAW RESPONSE:", text);
+
+    try {
+      const data = JSON.parse(text);
+      setData(data);
+    } catch {
+      console.error("Not JSON:", text);
+    }
   };
 
   useEffect(() => {
@@ -106,7 +117,9 @@ export default function DeveloperProfilePage() {
 
         <span>💼 Projects Completed: {data.contractCount}</span>
 
-        <span>🛠 Skills: {data.profile?.skills}</span>
+        🛠 Skills: {data.profile?.skills?.map(skill => (
+          <span key={skill}>{skill}</span>
+        ))}
 
       </div>
 
