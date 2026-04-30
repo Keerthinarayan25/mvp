@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import PortfolioCard from "@/component/portfolio/PortfolioCard";
 import AddPortfolioModal from "@/component/portfolio/AddPortfolioModal";
 import Image from "next/image";
@@ -34,8 +34,10 @@ interface ProfileData {
 
 export default function DeveloperProfilePage() {
 
+  const router = useRouter();
+
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const id = Number(params.id);
 
   const [data, setData] = useState<ProfileData | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -89,26 +91,28 @@ export default function DeveloperProfilePage() {
 
     <div className="max-w-4xl mx-auto mt-10 space-y-8">
 
-
       <div className="flex items-center gap-4">
 
         <Image
           src={data.profile?.profileImage || "/keerthinarayan M.jpg"}
           alt="profile"
-          width={64}
-          height={64}
+          width={80}
+          height={50}
           className="rounded-full object-cover"
         />
 
         <div>
           <h1 className="text-2xl font-bold">
-            {data.user.name}
+            {data?.user?.name}
           </h1>
 
           <p className="text-gray-500">
             {data.profile?.category}
           </p>
         </div>
+        <button onClick={() => router.push("/developer/profile/edit")}>
+          Edit Profile
+        </button>
 
       </div>
 
@@ -174,14 +178,14 @@ export default function DeveloperProfilePage() {
 
         </div>
 
-        {data.portfolio.length === 0 ? (
+        {data?.portfolio?.length === 0 ? (
           <p className="text-gray-500">
             No portfolio projects yet.
           </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            {data.portfolio.map((project) => (
+            {data?.portfolio?.map((project) => (
               <PortfolioCard
                 key={project.id}
                 project={project}

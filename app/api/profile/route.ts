@@ -98,32 +98,62 @@ export async function POST(req: NextRequest){
   return NextResponse.json(profile[0]);
 }
 
-export async function PATCH(req:NextRequest){
-  const token = req.cookies.get("token")?.value;
-  if(!token) return NextResponse.json({ error: "Unauthorized" }, {status: 401});
+export async function PATCH(req: NextRequest){
+  try{
+    const token = req.cookies.get("token")?.value;
 
-  const user = verifyToken(token);
-  const body = await req.json();
+    if(!token){
+      return NextResponse.json({ error: "Unauthorized"}, {status: 401});
+    }
+    
+    const user = verifyToken(token);
 
-  const existing  = await db.query.developerProfiles.findFirst({
-    where: eq(developerProfiles.userId, user.id)
-  });
+    if(user.role !== "developer"){
+      return NextResponse.json( { error: "Forbidden"}, { status: 403});
+    }
 
-  if(!existing) {
-    const created = await db.insert(developerProfiles).values({
-      userId: user.id,
-      ...body,
-    }).returning();
+    const body = await req.json();
 
-    return NextResponse.json(created[0]);
+    const existing = await db.query.developerProfiles.findFirst({
+      where: eq(developerProfiles.userId, user.id),
+    });
 
+    let result;
+
+    if(existing) {
+      result = await db
+      .update(developerProfiles)
+      .set({
+        bio: body.bio,
+        skills: body.skills,
+        github: body.github,
+        linkedin: body.linkedin,
+        profileImage:body.profileImage,
+      })
+      .where(eq(developerProfiles.userId, user.id))
+      .returning();
+    } else {
+      result = await db
+      .insert(developerProfiles)
+      .values({
+        userId: user.id,
+        bio:body.bio,
+        skills:body.skills,
+        github:body.github,
+        linkedin:body.linkedin,
+        profileImage:body.profileImage,
+      })
+      .returning();
+    }
+
+    return NextResponse.json(result[0]);
+
+  }catch (error){
+    console.error("PROFILE UPSERT ERROR:", error);
+
+    return NextResponse.json(
+      {error: "Failed to update profile"},
+      { status: 500}
+    );
   }
-
-  const updated = await db
-  .update(developerProfiles)
-  .set(body)
-  .where(eq(developerProfiles.userId, user.id))
-  .returning();
-
-  return NextResponse.json(updated[0]);
 }
