@@ -1,43 +1,63 @@
 "use client";
 
+import { useAuth } from "@/store/useAuth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
 
-export default function LoginPage(){
+export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    email:"",
-    password:""
+    email: "",
+    password: ""
   });
 
-  const handleLogin = async (e: React.SyntheticEvent<HTMLElement>) => {
-    e.preventDefault();
+  const { setUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  try {
+    setLoading(true);
 
     const res = await fetch("/api/auth/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(form),
     });
 
-    if (!res.ok) {
-      alert("Invalid credentials");
+    const data = await res.json();
+    console.log("LOGIN RESPONSE:", data);
+    console.log("USER:", data.user);
+
+    if (!res.ok || !data.user) {
+      alert(data.error || "Login failed");
       return;
     }
 
-    const userRes = await fetch("/api/auth/me");
-    const user = await userRes.json();
-    console.log("Login details:",user);
-    if (user.role === "developer") {
+    setUser(data.user);
+
+    if (data.user.role === "developer") {
+      // router.refresh();
       router.push("/developer/dashboard");
     } else {
+      // router.refresh();
       router.push("/founder/dashboard");
     }
 
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Something went wrong");
+  } finally {
+    setLoading(false); 
   }
+};
 
-  return(
+  return (
     <div className="flex min-h-screen items-center justify-center">
       <form
         onSubmit={handleLogin}
@@ -67,9 +87,9 @@ export default function LoginPage(){
           type="submit"
           className="w-full bg-black text-white p-2 rounded hover:bg-gray-800"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>
-  )
+  );
 }

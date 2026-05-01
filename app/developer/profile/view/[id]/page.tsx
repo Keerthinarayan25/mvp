@@ -1,40 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import PortfolioCard from "@/component/portfolio/PortfolioCard";
-import AddPortfolioModal from "@/component/portfolio/AddPortfolioModal";
-import Image from "next/image";
-import EditPortfolioModal from "@/component/portfolio/EditPortfolioModal";
+import { useParams } from "next/navigation";
+import AddPortfolioModal from "@/components/portfolio/AddPortfolioModal";
+import EditPortfolioModal from "@/components/portfolio/EditPortfolioModal";
+import Sidebar from "@/components/profile/Sidebar";
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import AboutCard from "@/components/profile/AboutCard";
+import LinksCard from "@/components/profile/LinksCard";
+import PortfolioSection from "@/components/profile/PortfolioSection";
+import SkillsTags from "@/components/profile/skillsTags";
 
 interface Portfolio {
-  id: number
-  title: string
-  description: string
-  projectLink: string
-  githubLink: string
+  id: number;
+  title: string;
+  description: string;
+  projectLink: string;
+  githubLink: string;
 }
 
 interface ProfileData {
   user: {
-    id: number
-    name: string
+    id: number;
+    name: string;
   }
   profile: {
-    bio: string
-    skills: string[]
-    category: string
-    github: string
-    linkedin: string
-    profileImage: string
+    bio: string;
+    skills: string[];
+    category: string;
+    github: string;
+    linkedin: string;
+    profileImage: string;
   }
-  portfolio: Portfolio[]
-  contractCount: number
+  portfolio: Portfolio[];
+  contractCount: number;
 }
 
 export default function DeveloperProfilePage() {
-
-  const router = useRouter();
 
   const params = useParams();
   const id = Number(params.id);
@@ -42,25 +44,25 @@ export default function DeveloperProfilePage() {
   const [data, setData] = useState<ProfileData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [editProject, setEditProject] = useState<Portfolio | null>(null);
+  const [loading, setLoading] = useState(true);
+
 
   const fetchProfile = async () => {
-    const res = await fetch(`/api/profile?id=${id}`);
-
-    console.log("STATUS:", res.status);
-
-    const text = await res.text();   // 👈 IMPORTANT
-    console.log("RAW RESPONSE:", text);
 
     try {
-      const data = JSON.parse(text);
-      setData(data);
-    } catch {
-      console.error("Not JSON:", text);
+      const res = await fetch(`/api/profile?id=${id}`);
+      const json = await res.json();
+
+      setData(json);
+    } catch (err) {
+      console.error("Fetch failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (id) fetchProfile();
+    fetchProfile();
   }, [id]);
 
   const handleDelete = async (id: number) => {
@@ -82,122 +84,51 @@ export default function DeveloperProfilePage() {
     }
   };
 
-
-  if (!data) {
-    return <div className="p-10">Loading...</div>
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6 animate-pulse">
+        <div className="h-40 bg-gray-200 rounded-xl" />
+      </div>
+    );
   }
+
+  if (!data) return null;
 
   return (
 
-    <div className="max-w-4xl mx-auto mt-10 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <div className="flex items-center gap-4">
+      <Sidebar />
 
-        <Image
-          src={data.profile?.profileImage || "/keerthinarayan M.jpg"}
-          alt="profile"
-          width={80}
-          height={50}
-          className="rounded-full object-cover"
+      <div className="lg:col-span-2 space-y-6">
+
+        <ProfileHeader
+          name={data.user.name}
+          image={data.profile.profileImage}
+          bio={data.profile.bio}
+          contractCount={data.contractCount}
+          skillsCount={data.profile.skills.length}
         />
 
-        <div>
-          <h1 className="text-2xl font-bold">
-            {data?.user?.name}
-          </h1>
+        <AboutCard bio={data.profile.bio} />
 
-          <p className="text-gray-500">
-            {data.profile?.category}
-          </p>
-        </div>
-        <button onClick={() => router.push("/developer/profile/edit")}>
-          Edit Profile
-        </button>
+        <LinksCard
+          github={data.profile.github}
+          linkedin={data.profile.linkedin}
+        />
+
+        <PortfolioSection
+          portfolio={data.portfolio}
+          onDelete={handleDelete}
+          onEdit={(project) => setEditProject(project)}
+          onAdd={() => setShowModal(true)}
+        />
+
+        <SkillsTags skills={data.profile.skills} />
+
 
       </div>
 
-
-      <div className="flex gap-6 text-sm text-gray-600">
-
-        <span>💼 Projects Completed: {data.contractCount}</span>
-
-        🛠 Skills: {data.profile?.skills?.map(skill => (
-          <span key={skill}>{skill}</span>
-        ))}
-
-      </div>
-
-
-      <div>
-        <h2 className="font-semibold text-lg mb-1">About</h2>
-        <p className="text-gray-700">
-          {data.profile?.bio}
-        </p>
-      </div>
-
-
-      <div className="flex gap-4 text-sm">
-
-        {data.profile?.github && (
-          <a
-            href={data.profile.github}
-            target="_blank"
-            className="text-blue-500"
-          >
-            GitHub
-          </a>
-        )}
-
-        {data.profile?.linkedin && (
-          <a
-            href={data.profile.linkedin}
-            target="_blank"
-            className="text-blue-500"
-          >
-            LinkedIn
-          </a>
-        )}
-
-      </div>
-
-
-      <div className="space-y-4">
-
-        <div className="flex justify-between items-center">
-
-          <h2 className="text-xl font-semibold">
-            Portfolio
-          </h2>
-
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-black text-white px-3 py-2 rounded"
-          >
-            + Add Project
-          </button>
-
-        </div>
-
-        {data?.portfolio?.length === 0 ? (
-          <p className="text-gray-500">
-            No portfolio projects yet.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            {data?.portfolio?.map((project) => (
-              <PortfolioCard
-                key={project.id}
-                project={project}
-                onDelete={handleDelete}
-                onEdit={(project) => setEditProject(project)}
-              />
-            ))}
-
-          </div>
-        )}
-
-      </div>
 
       {showModal && (
         <AddPortfolioModal

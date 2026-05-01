@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { DeveloperProfileForm } from "@/types/profile";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import SkillTagInput from "@/component/skills/SkillTagInput";
+import SkillTagInput from "@/components/skills/SkillTagInput";
 
 
 

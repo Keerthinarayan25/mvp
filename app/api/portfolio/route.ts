@@ -4,6 +4,14 @@ import { verifyToken } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 
+function normalizeUrl(url: string) {
+  if (!url.startsWith("http")) {
+    return "https://" + url;
+  }
+  return url;
+}
+
+
 export async function POST(req: NextRequest) {
   try{
     const token = req.cookies.get("token")?.value;
@@ -19,8 +27,8 @@ export async function POST(req: NextRequest) {
       developerId: user.id,
       title: body.title,
       description: body.description,
-      projectLink: body.projectLink,
-      githubLink: body.githubLink,
+      projectLink: normalizeUrl(body.projectLink),
+      githubLink: normalizeUrl(body.githubLink),
     }).returning()
 
     return NextResponse.json(newPortfolio);

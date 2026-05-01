@@ -11,10 +11,7 @@ export async function GET(req: NextRequest) {
     const token = req.cookies.get("token")?.value;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json(null);
     }
 
     const decoded = verifyToken(token);
@@ -23,13 +20,18 @@ export async function GET(req: NextRequest) {
       where: eq(users.id, decoded.id),
     });
 
-    return NextResponse.json(user);
+    if (!user) return NextResponse.json(null);
+
+    console.log("Auth ME:",user);
+
+    return NextResponse.json({
+      id: user.id,
+      name: user.name,
+      role: user.role,
+    });
 
   } catch {
 
-    return NextResponse.json(
-      { error: "Invalid token" },
-      { status: 401 }
-    );
+    return NextResponse.json(null);
   }
 }

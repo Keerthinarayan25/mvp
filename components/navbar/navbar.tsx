@@ -1,22 +1,16 @@
 "use client"
 
-import { User } from "@/types/user"
 import Link from "next/link";
-import { useEffect, useState } from "react"
+import ProfileDropdown from "./ProfileDropdown";
+import { useAuth } from "@/store/useAuth";
 
 
 
 export default function Navbar(){
 
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    fetch("/api/auth/me")
-    .then(res => res.json())
-    .then(data => setUser(data))
-  },[]);
-
-  console.log("User data is :",user?.role)
+  if (loading) return null;
 
   return(
     <nav className="border-b p-4 flex justify-between items-center">
@@ -37,7 +31,6 @@ export default function Navbar(){
           <Link href="/developer/contracts">My Work</Link>
           <Link href="/developer/dashboard">Dashboard</Link>
           <Link href="/developer/projects">Projects</Link>
-          <Link href={`/developer/profile/view/${user.id}`}>Profile</Link>
           </>
         )}
 
@@ -49,6 +42,8 @@ export default function Navbar(){
           <Link href="/founder/profile/create">Profile</Link>
           </>
         )}
+
+        {user && <ProfileDropdown user = {user} />}
       </div>
     </nav>
   )

@@ -4,6 +4,14 @@ import { verifyToken } from "@/lib/auth";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
+
+function normalizeUrl(url: string) {
+  if (!url.startsWith("http")) {
+    return "https://" + url;
+  }
+  return url;
+}
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -78,8 +86,8 @@ export async function PATCH(
 
     if (body.title?.trim()) updateData.title = body.title;
     if (body.description?.trim()) updateData.description = body.description;
-    if (body.projectLink?.trim()) updateData.projectLink = body.projectLink;
-    if (body.githubLink?.trim()) updateData.githubLink = body.githubLink;
+    if (body.projectLink?.trim()) updateData.projectLink = normalizeUrl(body.projectLink);
+    if (body.githubLink?.trim()) updateData.githubLink = normalizeUrl(body.githubLink);
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json(

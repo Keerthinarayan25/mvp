@@ -1,9 +1,19 @@
 "use client"
 
+import { useState } from "react"
+import SmartUrlInput from "./SmartUrlInput";
 interface Props {
   onClose: () => void;
 }
-import { useState } from "react"
+
+function isValidUrl(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export default function AddPortfolioModal({ onClose }: Props) {
 
@@ -22,10 +32,10 @@ export default function AddPortfolioModal({ onClose }: Props) {
     if (
       !form.title.trim() ||
       !form.description.trim() ||
-      !form.projectLink.trim() ||
-      !form.githubLink.trim()
+      !isValidUrl(form.projectLink)||
+      !isValidUrl(form.githubLink)
     ) {
-      setError("All Fields are required");
+      setError("Please enter valid URLs and fill all fields");
       return;
     }
 
@@ -91,22 +101,18 @@ export default function AddPortfolioModal({ onClose }: Props) {
             }
           />
 
-          <input
-            placeholder="Live Project URL"
-            className="w-full border p-2"
+          <SmartUrlInput
+            label="Live Project URL"
             value={form.projectLink}
-            onChange={(e) =>
-              setForm({ ...form, projectLink: e.target.value })
-            }
+            onChange={(val) => setForm({ ...form, projectLink: val })}
+            placeholder="example.com"
           />
 
-          <input
-            placeholder="GitHub URL"
-            className="w-full border p-2"
+          <SmartUrlInput
+            label="GitHub URL"
             value={form.githubLink}
-            onChange={(e) =>
-              setForm({ ...form, githubLink: e.target.value })
-            }
+            onChange={(val) => setForm({ ...form, githubLink: val })}
+            placeholder="github.com/username/repo"
           />
 
           <button className="bg-black text-white px-4 py-2 w-full">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SmartUrlInput from "./SmartUrlInput";
 
 interface Portfolio {
   project: {
@@ -27,8 +28,6 @@ export default function EditPortfolioModal({
   });
 
   const [error, setError] = useState("");
-  console.log("Editing project:", project);
-  console.log("Type of ID:", typeof project.id);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -125,22 +124,18 @@ export default function EditPortfolioModal({
             }
           />
 
-          <input
-            placeholder="Live Project URL"
+          <SmartUrlInput
+            label="Live Project URL"
             value={form.projectLink}
-            className="w-full border p-2"
-            onChange={(e) =>
-              setForm({ ...form, projectLink: e.target.value })
-            }
+            onChange={(val) => setForm({ ...form, projectLink: val })}
+            placeholder="example.com"
           />
 
-          <input
-            placeholder="GitHub URL"
+          <SmartUrlInput
+            label="GitHub URL"
             value={form.githubLink}
-            className="w-full border p-2"
-            onChange={(e) =>
-              setForm({ ...form, githubLink: e.target.value })
-            }
+            onChange={(val) => setForm({ ...form, githubLink: val })}
+            placeholder="github.com/username/repo"
           />
 
           <button className="bg-black text-white w-full p-2 rounded hover:bg-gray-800">
