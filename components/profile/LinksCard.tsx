@@ -1,32 +1,19 @@
-type Props = {
-  github: string;
-  linkedin: string;
-};
 
-export default function LinksCard({ github, linkedin }: Props) {
+
+export default function LinksCard({ links }: { links: any[] }) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm flex gap-4">
 
-      {github && (
+      {links.map((link, i) => (
         <a
-          href={github}
+          key={i}
+          href={link.url}
           target="_blank"
-          className="text-sm px-4 py-2 border rounded-lg hover:bg-gray-50"
+          className="px-4 py-2 border rounded-lg text-sm"
         >
-          GitHub
+          {link.label}
         </a>
-      )}
-
-      {linkedin && (
-        <a
-          href={linkedin}
-          target="_blank"
-          className="text-sm px-4 py-2 border rounded-lg hover:bg-gray-50"
-        >
-          LinkedIn
-        </a>
-      )}
-
+      ))}
     </div>
   );
 }

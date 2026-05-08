@@ -30,7 +30,7 @@ export default function ProfileDropdown({ user }: { user: any }) {
 
       <DropdownMenuTrigger asChild>
         <Image
-          src={user.profileImage || <User />}
+          src={user.profileImage || "/public/profile.svg"}
           alt="profileImage"
           width={36}
           height={36}
@@ -45,7 +45,7 @@ export default function ProfileDropdown({ user }: { user: any }) {
 
         <DropdownMenuLabel className="flex items-center gap-3 p-2">
           <Image
-            src={user.profileImage}
+            src={user.profileImage || "/public/profile.svg"}
             alt="profileImage"
             width={40}
             height={40}
@@ -62,7 +62,7 @@ export default function ProfileDropdown({ user }: { user: any }) {
 
         <DropdownMenuItem>
           <Link
-            href={`/${user.role}/profile/view/${user.id}`}
+            href={`/profile/${user.role}/${user.id}`}
             className="px-2 py-2 rounded hover:bg-gray-100"
           >
             Your Profile

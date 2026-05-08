@@ -35,7 +35,7 @@ export default function CreateProfilePage() {
       const res = await fetch("/api/auth/me");
       const user = await res.json();
 
-      const profileRes = await fetch(`/api/profile?id=${user.id}`);
+      const profileRes = await fetch(`/api/developer/profile?id=${user.id}`);
       const data = await profileRes.json();
 
       if (data.profile) {
@@ -77,7 +77,7 @@ export default function CreateProfilePage() {
   const onSubmit = async (data: DeveloperProfileForm) => {
     const userRes = await fetch("/api/auth/me");
     const user = await userRes.json();
-    const res = await fetch("/api/profile", {
+    const res = await fetch("/api/developer/profile", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"

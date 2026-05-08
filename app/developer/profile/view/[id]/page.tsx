@@ -50,7 +50,7 @@ export default function DeveloperProfilePage() {
   const fetchProfile = async () => {
 
     try {
-      const res = await fetch(`/api/profile?id=${id}`);
+      const res = await fetch(`/api/developer/profile?id=${id}`);
       const json = await res.json();
 
       setData(json);
@@ -105,9 +105,11 @@ export default function DeveloperProfilePage() {
         <ProfileHeader
           name={data.user.name}
           image={data.profile.profileImage}
-          bio={data.profile.bio}
-          contractCount={data.contractCount}
-          skillsCount={data.profile.skills.length}
+          subtitle={data.profile.category}
+          stats={[
+            { label: "projects", value: data.contractCount },
+            { label: "skills", value: data.profile.skills.length },
+          ]}
         />
 
         <AboutCard bio={data.profile.bio} />
