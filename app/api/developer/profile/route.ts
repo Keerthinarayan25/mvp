@@ -3,43 +3,101 @@ import { contracts, developerProfiles, portfolios, users } from "@/db/schema";
 // import jwt from "jsonwebtoken";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { signToken, verifyToken } from "@/lib/auth";
 
 
-// function getUserIdFromToken(req: NextRequest) {
-//   const token = req.cookies.get("token")?.value;
+export async function POST(req: NextRequest) {
 
-//   if (!token) return null;
+  try {
+    const token = req.cookies.get("token")?.value;
 
-//   const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-//     id: number
-//   }
-//   return decoded.id;
-// }
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const decoded = verifyToken(token);
+
+    const user =
+      await db.query.users.findFirst({
+        where: eq(users.id, decoded.id),
+      });
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          error: "User not found",
+        },
+        { status: 404, }
+      );
+    }
+
+    const body = await req.json();
 
 
+    const existing = await db.query.developerProfiles.findFirst({
+      where: eq(developerProfiles.userId, user.id),
+    });
 
+    if (existing) {
+      return NextResponse.json({ error: "Profile already exists" }, { status: 400 })
+    }
 
-export async function POST(req: NextRequest){
-  const token =  req.cookies.get("token")?.value;
+    const profile = await db.insert(developerProfiles).values({
+      userId: user.id,
+      ...body,
+    }).returning();
 
-  if(!token) return NextResponse.json({ error: "Unauthorized" }, {status: 401});
-  
-  const user = verifyToken(token);
-  const body = await req.json();
+    let updatedRoles = user.roles;
+    if (!updatedRoles.includes("developer")) {
+      updatedRoles = [
+        ...updatedRoles,
+        "developer",
+      ];
 
-  const existing = await db.query.developerProfiles.findFirst({
-    where: eq(developerProfiles.userId, user.id),
-  });
+      await db.update(users).set({
+        roles: updatedRoles,
+        activeRole: "developer",
+      }).where(eq(users.id, user.id));
+    }
 
-  if(existing){
-    return NextResponse.json({error:"Profile already exists"}, {status:400})
+    const newToken =
+      signToken({
+        id: user.id,
+        roles: updatedRoles as (
+          | "developer"
+          | "founder"
+        )[],
+        activeRole: "developer",
+      });
+
+      
+    const response = NextResponse.json(profile[0]);
+
+    response.cookies.set("token", newToken,
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      }
+    );
+
+    return response;
+
+  } catch (error) {
+
+    console.log(
+      "Developer profile error:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        error:
+          "Failed to create profile",
+      },
+      {
+        status: 500,
+      }
+    );
+
   }
-
-  const profile  = await db.insert(developerProfiles).values({
-    userId: user.id,
-    ...body,
-  }).returning();
-
-  return NextResponse.json(profile[0]);
 }

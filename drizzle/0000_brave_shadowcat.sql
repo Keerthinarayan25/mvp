@@ -38,6 +38,18 @@ CREATE TABLE "developer_profiles" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "founder_profiles" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer NOT NULL,
+	"bio" varchar(200),
+	"company_name" varchar(50),
+	"company_description" varchar(200),
+	"website" varchar(255),
+	"linkedin" varchar(255),
+	"profile_image" text,
+	"created_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "messages" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"contract_id" integer NOT NULL,
@@ -73,7 +85,8 @@ CREATE TABLE "users" (
 	"name" varchar(100) NOT NULL,
 	"email" varchar(150) NOT NULL,
 	"password" varchar(255) NOT NULL,
-	"role" "role" NOT NULL,
+	"roles" "role"[] NOT NULL,
+	"active_role" varchar(50) DEFAULT 'developer',
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "users_name_unique" UNIQUE("name"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
@@ -85,6 +98,7 @@ ALTER TABLE "contracts" ADD CONSTRAINT "contracts_project_id_projects_id_fk" FOR
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_developer_id_users_id_fk" FOREIGN KEY ("developer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_founder_id_users_id_fk" FOREIGN KEY ("founder_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "developer_profiles" ADD CONSTRAINT "developer_profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "founder_profiles" ADD CONSTRAINT "founder_profiles_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "messages" ADD CONSTRAINT "messages_contract_id_contracts_id_fk" FOREIGN KEY ("contract_id") REFERENCES "public"."contracts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "messages" ADD CONSTRAINT "messages_sender_id_users_id_fk" FOREIGN KEY ("sender_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "portfolios" ADD CONSTRAINT "portfolios_developer_id_users_id_fk" FOREIGN KEY ("developer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

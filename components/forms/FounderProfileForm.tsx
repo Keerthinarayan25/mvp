@@ -12,8 +12,9 @@ export default function FounderProfileForm({
   onSuccess,
 }: Props) {
 
-  const user = useAuth((s) => s.user);
+  const { user, setUser } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const[hasProfile, sethasProfile ] = useState(false);
 
   const {
     register,
@@ -25,18 +26,21 @@ export default function FounderProfileForm({
     if (!user) return;
     const load = async () => {
 
-      const res = await fetch(
-        `/api/founder/profile/${user.id}`
-      );
+      const res = await fetch(`/api/founder/profile/${user.id}`);
 
       const data = await res.json();
+      if(data.founderProfile){
+        sethasProfile(true);
+      }else{
+        sethasProfile(false);
+      }
 
       reset({
-        bio: data.founderProfile.bio,
-        companyName: data.companyName,
-        companyDescription: data.companyDescription,
-        website: data.founderProfile.website,
-        linkedIn: data.founderProfile.linkedin,
+        bio: data.founderProfile?.bio || "",
+        companyName: data.founderProfile?.companyName || "",
+        companyDescription: data.founderProfile?.companyDescription || "",
+        website: data.founderProfile?.website || "",
+        linkedIn: data.founderProfile?.linkedin || "",
         profileImage: data.founderProfile?.profileImage || "",
       });
     };
@@ -47,10 +51,12 @@ export default function FounderProfileForm({
   const onSubmit = async (formData: any) => {
     if (!user) return;
 
-    const res = await fetch(
-      `/api/founder/profile/${user.id}`,
+    const method = hasProfile ? "PATCH" : "POST";
+    const endPoint = hasProfile ? `/api/founder/profile/${user.id}` : "/api/founder/profile";
+
+    const res = await fetch(endPoint,
       {
-        method: "PATCH",
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -59,6 +65,9 @@ export default function FounderProfileForm({
     );
 
     if (res.ok) {
+      const me =await fetch("/api/auth/me");
+      const updatedUser = await me.json();
+      setUser(updatedUser);
       onSuccess();
     }
   };
@@ -142,7 +151,7 @@ export default function FounderProfileForm({
       />
 
       <input
-        {...register("linkedin")}
+        {...register("linkedIn")}
         maxLength={200}
         placeholder="LinkedIn"
         className="w-full border p-2 rounded"

@@ -8,7 +8,10 @@ export const users = pgTable("users", {
   name: varchar("name", { length: 100 }).notNull().unique(),
   email: varchar("email", { length: 150 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
-  role: roleEnum("role").notNull(),
+  roles: roleEnum("roles").array().notNull(),
+  activeRole: varchar("active_role", {
+    length: 50,
+  }).default("developer"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -33,11 +36,11 @@ export const developerProfiles = pgTable("developer_profiles", {
 export const founderProfiles = pgTable("founder_profiles", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  bio:varchar("bio",{length:200}),
-  companyName:varchar("company_name",{length:50}),
-  companyDescription:varchar("company_description",{ length: 200}),
-  website:varchar("website", { length: 255 }),
-  linkedIn:varchar("linkedin",{ length: 255}),
+  bio: varchar("bio", { length: 200 }),
+  companyName: varchar("company_name", { length: 50 }),
+  companyDescription: varchar("company_description", { length: 200 }),
+  website: varchar("website", { length: 255 }),
+  linkedIn: varchar("linkedin", { length: 255 }),
   profileImage: text("profile_image"),
   createdAt: timestamp("created_at").defaultNow(),
 })

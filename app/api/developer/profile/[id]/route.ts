@@ -73,11 +73,12 @@ export async function PATCH(
     const user = verifyToken(token);
     const { id } = await params;
 
-    if (user.role !== "developer") {
+    if (user.activeRole !== "developer") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
+    console.log("BODY OF DEVEOPER PROFILE:",body);
 
     const existing = await db.query.developerProfiles.findFirst({
       where: eq(developerProfiles.userId, user.id),

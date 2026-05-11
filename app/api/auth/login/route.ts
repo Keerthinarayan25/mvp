@@ -31,23 +31,37 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = signToken({
-      id: user.id,
-      role: user.role,
+    const activeRole = user.activeRole === "founder"
+        ? "founder"
+        : "developer";
+
+    const token = signToken({id: user.id,
+      roles: user.roles as (
+        | "developer"
+        | "founder"
+      )[],
+      activeRole,
     });
 
+    // const token = signToken({
+    //   id: user.id,
+    //   roles: user.roles,
+    //   activeRole: user.activeRole,
+    // });
+
     const response = NextResponse.json({
-      message: "Login successful",
       user: {
         id: user.id,
         name: user.name,
-        role: user.role,
+        roles: user.roles,
+        activeRole: user.activeRole,
       },
     });
 
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     });

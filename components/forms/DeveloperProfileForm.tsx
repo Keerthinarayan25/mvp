@@ -10,7 +10,7 @@ export default function DeveloperProfileForm({
   onSuccess,
 }: Props) {
 
-  const user = useAuth((s) => s.user);
+  const { user, setUser } = useAuth();
   const [uploading, setUploading] = useState(false);
 
   const {
@@ -51,8 +51,13 @@ export default function DeveloperProfileForm({
     });
 
     if (res.ok) {
+      const me = await fetch("/api/auth/me");
+      const updatedUser = await me.json();
+      console.log("UPDATED USER:",updatedUser);
+      setUser(updatedUser);
       onSuccess();
     }
+
   };
 
   const handleImageUpload = async (file: File) => {

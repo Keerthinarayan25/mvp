@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1777364689235,
-      "tag": "0000_sparkling_landau",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1777365923750,
-      "tag": "0001_sleepy_patch",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1777366131923,
-      "tag": "0002_calm_human_cannonball",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1777732591132,
-      "tag": "0003_steady_penance",
+      "when": 1778318585379,
+      "tag": "0000_brave_shadowcat",
       "breakpoints": true
     }
   ]

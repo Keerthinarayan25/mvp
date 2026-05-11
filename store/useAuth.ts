@@ -1,13 +1,18 @@
 "use client";
 import { create } from "zustand";
 
+export type UserRole =
+  | "developer"
+  | "founder";
 
 type User = {
   id:number;
   name:string;
   email:string;
-  role: "developer" | "founder";
-
+  roles: UserRole[];
+  activeRole: UserRole;
+  profileImage?: string | null;
+  
 } | null;
 
 type AuthState = {

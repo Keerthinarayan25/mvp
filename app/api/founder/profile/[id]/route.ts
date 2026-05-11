@@ -68,11 +68,9 @@ export async function PATCH(
     console.log("USER FOUNDER DETAILS:", user);
     const { id } = await params;
 
-    if (user.role !== "founder") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
+    
     const body = await req.json();
+
 
     console.log("BODY OF FOUNDER PROFILE:", body);
 

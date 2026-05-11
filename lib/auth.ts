@@ -1,16 +1,35 @@
 import jwt from "jsonwebtoken";
 
+export type UserRole =
+  | "developer"
+  | "founder";
+
 export interface JwtPayload {
   id: number;
-  role: "developer" | "founder";
+  roles: UserRole[];
+  activeRole: UserRole;
 }
 
+const JWT_SECRET =  process.env.JWT_SECRET!;
+
 export function signToken(payload: JwtPayload) {
-  return jwt.sign(payload, process.env.JWT_SECRET!, {
-    expiresIn: "7d",
-  });
+
+  return jwt.sign(payload,JWT_SECRET,{
+      expiresIn: "7d",
+    }
+  );
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+
+  try {
+
+    return jwt.verify(token,JWT_SECRET) as JwtPayload;
+
+  } catch {
+
+    throw new Error(
+      "Invalid token"
+    );
+  }
 }

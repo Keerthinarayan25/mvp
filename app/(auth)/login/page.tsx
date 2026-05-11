@@ -41,7 +41,7 @@ const handleLogin = async (e: React.FormEvent) => {
 
     setUser(data.user);
 
-    if (data.user.role === "developer") {
+    if (data.user.activeRole === "developer") {
       // router.refresh();
       router.push("/developer/dashboard");
     } else {

@@ -1,6 +1,16 @@
-export interface User {
+export type UserRole =  "developer" | "founder";
+
+export interface AuthUser {
+
   id: number;
+
   name: string;
+
   email: string;
-  role: "developer" | "founder";
+
+  roles: UserRole[];
+
+  activeRole: UserRole;
+
+  profileImage?: string | null;
 }

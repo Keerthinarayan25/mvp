@@ -1,6 +1,7 @@
 import { db } from "@/db";
-import { applications } from "@/db/schema";
+import { applications, projects } from "@/db/schema";
 import { verifyToken } from "@/lib/auth";
+import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -17,13 +18,100 @@ export async function POST(req: NextRequest) {
       )
     }
     const user = verifyToken(token);
-    const body = await req.json();
 
-    console.log("Application poject ID:", body.project_id)
+    if (user.activeRole !=="developer") {
+
+      return NextResponse.json(
+        {
+          error:
+            "Only developers can apply",
+        },
+        {
+          status: 403,
+        }
+      );
+    }
+    const body = await req.json();
+    const projectId = Number(body.projectId);
+
+    if (!projectId) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Invalid project",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    console.log("Application poject ID:", projectId);
+
+
+    const project =
+      await db.query.projects.findFirst({
+        where: eq(
+          projects.id,
+          projectId
+        ),
+      });
+
+    if (!project) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Project not found",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    if (project.founderId === user.id) {
+
+      return NextResponse.json(
+        {
+          error:
+            "You cannot apply to your own project",
+        },
+        {
+          status: 403,
+        }
+      );
+    }
+
+    const existingApplication =
+      await db.query.applications.findFirst({
+        where: and(
+          eq(applications.projectId,projectId),
+
+          eq(applications.developerId,user.id)
+        ),
+      });
+
+    if (existingApplication) {
+
+      return NextResponse.json(
+        {
+          error:
+            "You already applied to this project",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+
+    
     const newApplication = await db
       .insert(applications)
       .values({
-        projectId: Number(body.projectId),
+        projectId,
         developerId: user.id,
         proposalMessage: body.proposalMessage,
         proposedPrice: body.proposedPrice,
@@ -31,7 +119,7 @@ export async function POST(req: NextRequest) {
       })
       .returning()
     
-    return NextResponse.json(newApplication);
+    return NextResponse.json(newApplication[0]);
 
   } catch (error) {
 

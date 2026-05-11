@@ -10,7 +10,6 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    role: "developer",
   });
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -62,16 +61,6 @@ export default function RegisterPage() {
             setForm({ ...form, password: e.target.value })
           }
         />
-
-        <select
-          className="w-full border p-2 rounded"
-          onChange={(e) =>
-            setForm({ ...form, role: e.target.value })
-          }
-        >
-          <option value="developer">Developer</option>
-          <option value="founder">Founder</option>
-        </select>
 
         <button
           type="submit"

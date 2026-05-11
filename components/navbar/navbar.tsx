@@ -6,13 +6,14 @@ import { useAuth } from "@/store/useAuth";
 
 
 
-export default function Navbar(){
+export default function Navbar() {
 
   const { user, loading } = useAuth();
 
+
   if (loading) return null;
 
-  return(
+  return (
     <nav className="border-b p-4 flex justify-between items-center">
       <h1 className="font-bold text-lg">
         MVP DEV
@@ -21,29 +22,30 @@ export default function Navbar(){
       <div className="flex gap-4">
         {!user && (
           <>
-          <Link href="/login">Login</Link>
-          <Link href="/register">Register</Link>
+            <Link href="/login">Login</Link>
+            <Link href="/register">Register</Link>
           </>
         )}
 
-        {user?.role === "developer" && (
+        {user?.activeRole === "developer" && (
           <>
-          <Link href="/developer/contracts">My Work</Link>
-          <Link href="/developer/dashboard">Dashboard</Link>
-          <Link href="/developer/projects">Projects</Link>
+            <Link href="/developer/contracts">My Work</Link>
+            <Link href="/developer/dashboard">Dashboard</Link>
+            <Link href="/developer/projects">Projects</Link>
           </>
         )}
 
-        {user?.role === "founder" && (
+        {user?.activeRole === "founder" && (
           <>
-          <Link href="/founder/contracts">Contracts</Link>
-          <Link href="/founder/dashboard">Dashboard</Link>
-          <Link href="/founder/projects">My Projects</Link>
-          <Link href="/founder/profile/create">Profile</Link>
+            <Link href="/founder/contracts">Contracts</Link>
+            <Link href="/founder/dashboard">Dashboard</Link>
+            <Link href="/founder/projects">My Projects</Link>
           </>
         )}
 
-        {user && <ProfileDropdown user = {user} />}
+        {user && (
+          <ProfileDropdown user={user} />
+        )}
       </div>
     </nav>
   )
