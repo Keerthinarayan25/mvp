@@ -34,6 +34,7 @@ export default function ProfileDropdown({ user }: Props) {
 
   const switchRole = async (role: string) => {
     const res = await fetch("/api/auth/switch-role", {
+      cache: "no-store",
       method: "PATCH",
       headers: {
         "Content-Type":
@@ -53,7 +54,7 @@ export default function ProfileDropdown({ user }: Props) {
     } else {
       router.push("/founder/dashboard");
     }
-    // router.refresh();
+    router.refresh();
   };
 
 

@@ -7,11 +7,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req:NextRequest) {
   try {
-
     const url = new URL(req.url);
     const mine = url.searchParams.get("mine");
 
-    if(mine === "mine"){
+    if(mine === "true"){
       const token = req.cookies.get("token")?.value;
       
       if(!token) {
@@ -28,7 +27,6 @@ export async function GET(req:NextRequest) {
       .where(eq(projects.founderId, user.id))
 
       return NextResponse.json(myProjects);
-
     }
 
     const allProjects = await db
@@ -58,6 +56,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
     const user = verifyToken(token);
+    if(user.activeRole !== "founder"){
+      return NextResponse.json(
+        { error:"Only founders can create projects"},
+        { status:403 },
+      );
+    }
     const body = await req.json();
 
     const newProject = await db
@@ -69,10 +73,11 @@ export async function POST(req: NextRequest) {
         budgetRange: body.budgetRange,
         timeline: body.timeline,
         techStack: body.techStack,
+        status:"open"
       })
       .returning()
     
-    return NextResponse.json(newProject);
+    return NextResponse.json(newProject[0]);
   } catch {
     return NextResponse.json(
       { error: "Failed to create Project"},

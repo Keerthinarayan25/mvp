@@ -1,12 +1,12 @@
 "use client";
 
-import { User } from "@/types/user";
+import { AuthUser } from "@/types/user";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 
 export default function DeveloperDashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -34,7 +34,7 @@ export default function DeveloperDashboard() {
           Browse Projects
         </Link>
         <Link
-          href="/developer/profile/view"
+          href={`/profile/${user.activeRole}/${user.id}`}
           className="border p-4 rounded hover:shadow"
         >
           View Profile

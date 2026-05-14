@@ -1,12 +1,12 @@
 "use client";
 
-import { User } from "@/types/user";
+import { AuthUser } from "@/types/user";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 
 export default function FounderDashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -27,6 +27,12 @@ export default function FounderDashboard() {
           className="border p-4 rounded hover:shadow"
         >
           Post New Project
+        </Link>
+        <Link
+          href={`/profile/${user.activeRole}/${user.id}`}
+          className="border p-4 rounded hover:shadow"
+        >
+          View Profile
         </Link>
 
         <Link
