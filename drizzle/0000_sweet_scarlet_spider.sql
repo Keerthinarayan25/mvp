@@ -1,12 +1,17 @@
+CREATE TYPE "public"."application_status" AS ENUM('pending', 'accepted', 'rejected');--> statement-breakpoint
+CREATE TYPE "public"."contract_status" AS ENUM('active', 'completed', 'cancelled');--> statement-breakpoint
+CREATE TYPE "public"."project_status" AS ENUM('open', 'in_progress', 'completed', 'cancelled');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('developer', 'founder');--> statement-breakpoint
-CREATE TABLE "application" (
+CREATE TYPE "public"."timeline_unit" AS ENUM('days', 'weeks', 'months');--> statement-breakpoint
+CREATE TABLE "applications" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"project_id" integer NOT NULL,
 	"developer_id" integer NOT NULL,
 	"proposal_message" text,
-	"proposed_price" varchar(100),
-	"delivery_time" varchar(100),
-	"status" varchar(20) DEFAULT 'pending',
+	"proposed_price" integer,
+	"currency" varchar(10) DEFAULT 'USD',
+	"delivery_time" integer,
+	"status" "application_status" DEFAULT 'pending',
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
@@ -15,9 +20,10 @@ CREATE TABLE "contracts" (
 	"project_id" integer NOT NULL,
 	"developer_id" integer NOT NULL,
 	"founder_id" integer NOT NULL,
-	"agreed_price" varchar(100),
-	"deadline" varchar(100),
-	"status" varchar(50) DEFAULT 'active',
+	"agreed_price" integer,
+	"currency" varchar(10) DEFAULT 'USD',
+	"deadline" timestamp,
+	"status" "contract_status" DEFAULT 'active',
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
@@ -72,11 +78,13 @@ CREATE TABLE "projects" (
 	"founder_id" integer NOT NULL,
 	"title" varchar(200) NOT NULL,
 	"description" varchar NOT NULL,
-	"budget_range" varchar(50),
-	"timeline" varchar(50),
-	"tech_stack" varchar(255),
-	"project_type" varchar(50),
-	"status" varchar(20) DEFAULT 'open',
+	"budget_min" integer NOT NULL,
+	"budget_max" integer NOT NULL,
+	"currency" varchar(10) DEFAULT 'USD',
+	"timeline_value" integer,
+	"timeline_unit" timeline_unit,
+	"tech_stack" text[],
+	"status" "project_status" DEFAULT 'open',
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
@@ -86,14 +94,14 @@ CREATE TABLE "users" (
 	"email" varchar(150) NOT NULL,
 	"password" varchar(255) NOT NULL,
 	"roles" "role"[] NOT NULL,
-	"active_role" varchar(50) DEFAULT 'developer',
+	"active_role" "role" DEFAULT 'developer',
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "users_name_unique" UNIQUE("name"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-ALTER TABLE "application" ADD CONSTRAINT "application_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "application" ADD CONSTRAINT "application_developer_id_users_id_fk" FOREIGN KEY ("developer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "applications" ADD CONSTRAINT "applications_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "applications" ADD CONSTRAINT "applications_developer_id_users_id_fk" FOREIGN KEY ("developer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_project_id_projects_id_fk" FOREIGN KEY ("project_id") REFERENCES "public"."projects"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_developer_id_users_id_fk" FOREIGN KEY ("developer_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "contracts" ADD CONSTRAINT "contracts_founder_id_users_id_fk" FOREIGN KEY ("founder_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

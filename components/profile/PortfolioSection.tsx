@@ -6,17 +6,19 @@ interface Portfolio {
   githubLink: string;
 }
 
+type Props = {
+  portfolio: Portfolio[];
+  onDelete?: (id: number) => void;
+  onEdit?: (project: Portfolio) => void;
+  onAdd?: () => void;
+};
+
 export default function PortfolioSection({
   portfolio,
   onDelete,
   onEdit,
   onAdd,
-}: {
-  portfolio: Portfolio[];
-  onDelete: (id: number) => void;
-  onEdit: (project: Portfolio) => void;
-  onAdd: () => void;
-}) {
+}: Props) {
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
@@ -26,7 +28,7 @@ export default function PortfolioSection({
         <h2 className="font-semibold text-lg">Portfolio</h2>
 
         <button
-          onClick={onAdd}
+          onClick={() => onAdd?.()}
           className="bg-black text-white px-3 py-2 rounded-lg text-sm hover:opacity-90"
         >
           + Add Project
@@ -53,14 +55,14 @@ export default function PortfolioSection({
               <div className="absolute top-2 right-2 hidden group-hover:flex gap-2">
 
                 <button
-                  onClick={() => onEdit(project)}
+                  onClick={() => onEdit?.(project)}
                   className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
                 >
                   Edit
                 </button>
 
                 <button
-                  onClick={() => onDelete(project.id)}
+                  onClick={() => onDelete?.(project.id)}
                   className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
                 >
                   Delete

@@ -10,8 +10,18 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { mapFounderToView, mapDeveloperToView } from "@/lib/profile/mapper";
 import EditProfileModal from "@/components/profile/EditProfileModal";
+import SkillsEditModal from "@/components/profile/SkillsEditModal";
+import AddPortfolioModal from "@/components/portfolio/AddPortfolioModal";
+import EditPortfolioModal from "@/components/portfolio/EditPortfolioModal";
 
 
+interface Portfolio {
+  id: number;
+  title: string;
+  description: string;
+  projectLink: string;
+  githubLink: string;
+}
 
 export default function ProfilePage() {
 
@@ -22,6 +32,9 @@ export default function ProfilePage() {
   const [view, setView] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
+  const [showSkillsEdit, setShowSkillsEdit] = useState(false);
+  const [showAddPortfolio, setShowAddPortfolio] = useState(false);
+  const [editingPortfolio, setEditingPortfolio] = useState<Portfolio | null>(null);
 
   console.log("ROLE, ID:", role, id);
 
@@ -134,7 +147,10 @@ export default function ProfilePage() {
                     mb-8">
                     Skills
                   </h3>
-                  <SkillsTags skills={section.data} />
+                  <SkillsTags
+                    skills={section.data}
+                    onEdit={() => setShowSkillsEdit(true)}
+                  />
                 </section>
               );
             }
@@ -146,7 +162,19 @@ export default function ProfilePage() {
                     mb-8">
                     Portfolio
                   </h3>
-                  <PortfolioSection portfolio={section.data} />
+                  <PortfolioSection
+                    portfolio={section.data}
+                    onAdd={() => setShowAddPortfolio(true)}
+                    onEdit={(project) => setEditingPortfolio(project)}
+                    onDelete={async (id) => {
+                      const res = await fetch(`/api/portfolio/${id}`,
+                        {
+                          method: "DELETE",
+                        }
+                      );
+                      if (res.ok) fetchProfile();
+                    }}
+                  />
                 </section>
               );
             }
@@ -175,6 +203,41 @@ export default function ProfilePage() {
           onSuccess={() => {
             fetchProfile();
             setShowEdit(false);
+          }}
+        />
+      )}
+
+      {showSkillsEdit && (
+        <SkillsEditModal
+          currentSkills={
+            view.sections.find(
+              (s: any) =>
+                s.type === "skills"
+            )?.data || []
+          }
+
+          onClose={() => setShowSkillsEdit(false)}
+          onSuccess={() => { fetchProfile(); }}
+        />
+      )}
+
+      {showAddPortfolio && (
+        <AddPortfolioModal
+          onClose={() => setShowAddPortfolio(false)}
+          onSuccess={() => {
+            fetchProfile();
+            setShowAddPortfolio(false);
+          }}
+        />
+      )}
+
+      {editingPortfolio && (
+        <EditPortfolioModal
+          project={editingPortfolio}
+          onClose={() => setEditingPortfolio(null)}
+          onUpdated={() => {
+            fetchProfile();
+            setEditingPortfolio(null);
           }}
         />
       )}

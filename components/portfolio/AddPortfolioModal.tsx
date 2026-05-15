@@ -4,6 +4,7 @@ import { useState } from "react"
 import SmartUrlInput from "./SmartUrlInput";
 interface Props {
   onClose: () => void;
+  onSuccess: () => void;
 }
 
 function isValidUrl(url: string) {
@@ -15,7 +16,7 @@ function isValidUrl(url: string) {
   }
 }
 
-export default function AddPortfolioModal({ onClose }: Props) {
+export default function AddPortfolioModal({ onClose, onSuccess }: Props) {
 
   const [form, setForm] = useState({
     title: "",
@@ -32,8 +33,8 @@ export default function AddPortfolioModal({ onClose }: Props) {
     if (
       !form.title.trim() ||
       !form.description.trim() ||
-      !isValidUrl(form.projectLink)||
-      !isValidUrl(form.githubLink)
+      (form.projectLink && !isValidUrl(form.projectLink)) ||
+      (form.githubLink && !isValidUrl(form.githubLink))
     ) {
       setError("Please enter valid URLs and fill all fields");
       return;
@@ -48,6 +49,7 @@ export default function AddPortfolioModal({ onClose }: Props) {
     })
 
     if (res.ok) {
+      onSuccess();
       onClose();
     } else {
       setError("Failed to Add Projects");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {Globe,AlertCircle} from "lucide-react";
 
 type Props = {
   label: string;
@@ -10,24 +10,36 @@ type Props = {
 };
 
 function normalizeUrl(url: string) {
+
   if (!url) return "";
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+
+  if (
+    !url.startsWith("http://") &&
+    !url.startsWith("https://")
+  ) {
     return "https://" + url;
   }
+
   return url;
 }
 
 function isValidUrl(url: string) {
+
   try {
     new URL(url);
     return true;
+
   } catch {
     return false;
   }
 }
 
 function detectType(url: string) {
-  if (url.includes("github.com")) return "github";
+
+  if (url.includes("github.com")) {
+    return "github";
+  }
+
   return "live";
 }
 
@@ -37,51 +49,73 @@ export default function SmartUrlInput({
   onChange,
   placeholder,
 }: Props) {
-  const [internal, setInternal] = useState(value);
-  const [valid, setValid] = useState(true);
-  const [type, setType] = useState<"github" | "live" | null>(null);
 
-  useEffect(() => {
-    if (!internal) {
-      setValid(true);
-      setType(null);
-      return;
-    }
+  const normalized =
+    normalizeUrl(value);
 
-    const normalized = normalizeUrl(internal);
-    const isValid = isValidUrl(normalized);
+  const valid =
+    !value || isValidUrl(normalized);
 
-    setValid(isValid);
-    setType(isValid ? detectType(normalized) : null);
-
-    onChange(normalized);
-  }, [internal]);
+  const type =
+    valid && value
+      ? detectType(normalized)
+      : null;
 
   return (
     <div className="space-y-1">
-      <label className="text-sm font-medium">{label}</label>
+
+      <label className="text-sm font-medium">
+        {label}
+      </label>
 
       <div className="relative">
+
         <input
-          value={internal}
-          onChange={(e) => setInternal(e.target.value)}
+          value={value}
+          onChange={(e) =>
+            onChange(e.target.value)
+          }
           placeholder={placeholder}
           className={`w-full border p-2 pr-10 rounded-md text-sm ${
-            valid ? "border-gray-300" : "border-red-500"
+            valid
+              ? "border-gray-300"
+              : "border-red-500"
           }`}
         />
 
         {/* ICON */}
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm">
-          {type === "github" && ""}
-          {type === "live" && valid && ""}
-          {!valid && "⚠️"}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+
+          {type === "github" && (
+            <Globe
+              size={16}
+              className="text-gray-700"
+            />
+          )}
+
+          {type === "live" && valid && (
+            <Globe
+              size={16}
+              className="text-gray-700"
+            />
+          )}
+
+          {!valid && (
+            <AlertCircle
+              size={16}
+              className="text-red-500"
+            />
+          )}
+
         </div>
       </div>
 
       {!valid && (
-        <p className="text-xs text-red-500">Invalid URL</p>
+        <p className="text-xs text-red-500">
+          Invalid URL
+        </p>
       )}
+
     </div>
   );
 }
