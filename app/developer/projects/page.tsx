@@ -5,7 +5,7 @@ import ProjectCard from "@/components/project/ProjectCard"
 
 interface Project {
   id: number
-  title: string
+  title: string;
   description: string
   budgetRange: string
   techStack: string

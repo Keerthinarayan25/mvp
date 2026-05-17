@@ -69,6 +69,10 @@ export function mapFounderToView(data: any) {
         type: "projects",
         data: data.projects || [],
       },
+      {
+        type: "developers",
+        data: data.hiredDevelopers || [],
+      },
     ],
   };
 }

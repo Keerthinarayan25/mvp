@@ -30,6 +30,12 @@ export const timelineUnitEnum =
     "months",
   ]);
 
+export const experienceLevelEnum = pgEnum("experience_level", [
+  "entry",
+  "intermediate",
+  "expert",
+]);
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   // profileImage: text("profile_image")
@@ -78,11 +84,13 @@ export const projects = pgTable("projects", {
   description: varchar("description").notNull(),
   budgetMin: integer("budget_min").notNull(),
   budgetMax: integer("budget_max").notNull(),
-  currency: varchar("currency",{ length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
   timelineValue: integer("timeline_value"),
   timelineUnit: timelineUnitEnum("timeline_unit"),
   techStack: text("tech_stack").array(),
   status: projectStatusEnum("status").default("open"),
+  experienceLevel: experienceLevelEnum("experience_level")
+    .default("intermediate"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -90,10 +98,11 @@ export const applications = pgTable("applications", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
   developerId: integer("developer_id").references(() => users.id).notNull(),
-  proposalMessage: text("proposal_message"),
-  proposedPrice: integer("proposed_price"),
-  currency: varchar("currency",{length: 10}).default("USD"),
-  deliveryDays: integer("delivery_time"),
+  proposalMessage: text("proposal_message").notNull(),
+  proposedPrice: integer("proposed_price").notNull(),
+  currency: varchar("currency",{ length: 10 }).default("USD"),
+  deliveryValue: integer("delivery_value"),
+  deliveryUnit: timelineUnitEnum("delivery_unit"),
   status: applicationStatusEnum("status").default("pending"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -104,7 +113,7 @@ export const contracts = pgTable("contracts", {
   developerId: integer("developer_id").references(() => users.id).notNull(),
   founderId: integer("founder_id").references(() => users.id).notNull(),
   agreedprice: integer("agreed_price"),
-  currency: varchar("currency", {length: 10}).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
   deadline: timestamp("deadline"),
   status: contractStatusEnum("status").default("active"),
   createdAt: timestamp("created_at").defaultNow(),

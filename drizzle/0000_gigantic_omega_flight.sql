@@ -1,5 +1,6 @@
 CREATE TYPE "public"."application_status" AS ENUM('pending', 'accepted', 'rejected');--> statement-breakpoint
 CREATE TYPE "public"."contract_status" AS ENUM('active', 'completed', 'cancelled');--> statement-breakpoint
+CREATE TYPE "public"."experience_level" AS ENUM('entry', 'intermediate', 'expert');--> statement-breakpoint
 CREATE TYPE "public"."project_status" AS ENUM('open', 'in_progress', 'completed', 'cancelled');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('developer', 'founder');--> statement-breakpoint
 CREATE TYPE "public"."timeline_unit" AS ENUM('days', 'weeks', 'months');--> statement-breakpoint
@@ -85,6 +86,7 @@ CREATE TABLE "projects" (
 	"timeline_unit" timeline_unit,
 	"tech_stack" text[],
 	"status" "project_status" DEFAULT 'open',
+	"experience_level" "experience_level" DEFAULT 'intermediate',
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint

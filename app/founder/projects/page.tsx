@@ -1,42 +1,65 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import ProjectsSection from "@/components/project/ProjectSection";
 
-interface Project {
-  id: number,
-  title: string,
-  description: string,
-  budgetRange: string,
-  status: string
-}
+import CreateProjectModal from "@/components/project/CreateProjectModal";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/store/useAuth";
+import { useRouter } from "next/navigation";
 
+type Project = {
+  id: number;
+  founderId: number;
+  title: string;
+  description: string;
+  budgetMin: number;
+  budgetMax: number;
+  currency: string;
+  timelineValue: number;
+  timelineUnit: string;
+  techStack: string[];
+  experienceLevel: string;
+  status: string;
+};
 
 export default function FounderProjectsPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreate, setShowCreate] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch("/api/projects?mine=true", {
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        return;
+      }
+
+      const data = await res.json();
+      setProjects(data);
+
+    } catch (error) {
+      console.log("ERROR IN FOUNDER PROJECT PAGE:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const res = await fetch("/api/projects?mine=true",
-          { cache: "no-store" },
-        );
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-        setProjects(data);
-      } catch (error) {
-        console.log("ERROR IN FOUNDER PROJECT PAGE:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (user && user.activeRole !== "founder") {
+      router.push("/projects");
+      return;
     }
-    loadProjects();
-  }, []);
+    fetchProjects();
+  }, [user,router]);
+
 
   if (loading) {
     return (
@@ -48,58 +71,50 @@ export default function FounderProjectsPage() {
 
   return (
 
-    <div className="max-w-4xl mx-auto mt-10 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
 
-        <h1 className="text-2xl font-bold">
-          My Projects
-        </h1>
+      {/* HEADER */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">
+            My Projects
+          </h1>
 
-        <Link
-          href="/founder/projects/create"
-          className="bg-black text-white px-2 py-2 rounded-lg"
-        >
-          Create Project
-        </Link>
-
-      </div>
-      {projects.length === 0 && (
-        <p className="text-gray-500">
-          No Projects Posted Yet !
-        </p>
-      )}
-      {projects.map((project) => (
-        <div
-          key={project.id}
-          className="border p-5 rounded-xl space-y-6"
-        >
-          <h2 className="text-lg font-semibold">
-            {project.title}
-          </h2>
-
-          <p className="text-gray-800 mt-2">
-            {project.description}
+          <p className="text-gray-500 mt-1">
+            Manage projects and hire developers
           </p>
 
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-sm text-gray-500">
-              💰 {project.budgetRange}
-            </span>
-
-            <span className="text-sm">
-              Status: {" "} {project.status}
-            </span>
-          </div>
-
-          <Link
-            href={`/founder/projects/${project.id}/applications`}
-            className="text-blue-500 text-sm"
-          >
-            View Applications
-          </Link>
-
         </div>
-      ))}
+
+        {user?.activeRole !== "developer" && (
+          <Button
+            onClick={() => setShowCreate(true)}
+            className="text-white rounded-xl hover:opacity-90 transition"
+          >
+            + Create Project
+          </Button>
+        )
+        }
+
+      </div>
+
+      {/* PROJECTS */}
+      <ProjectsSection
+        projects={projects}
+        isOwner={true}
+      />
+      {/* CREATE MODAL */}
+      {showCreate && (
+        <CreateProjectModal
+          onClose={() => setShowCreate(false)}
+          onCreated={() => {
+            setShowCreate(false);
+            fetchProjects();
+          }}
+        />
+
+      )}
+
     </div>
-  )
+  );
 }

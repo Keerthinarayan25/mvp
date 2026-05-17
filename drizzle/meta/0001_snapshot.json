@@ -1,6 +1,6 @@
 {
-  "id": "2a78648e-c9dc-456a-848d-732ed221ab63",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "614d8871-1687-453f-9fd5-2be5de9c6a9b",
+  "prevId": "2a78648e-c9dc-456a-848d-732ed221ab63",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -30,13 +30,13 @@
           "name": "proposal_message",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "proposed_price": {
           "name": "proposed_price",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "currency": {
           "name": "currency",
@@ -45,9 +45,16 @@
           "notNull": false,
           "default": "'USD'"
         },
-        "delivery_time": {
-          "name": "delivery_time",
+        "delivery_value": {
+          "name": "delivery_value",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delivery_unit": {
+          "name": "delivery_unit",
+          "type": "timeline_unit",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },

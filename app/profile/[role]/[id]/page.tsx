@@ -13,6 +13,8 @@ import EditProfileModal from "@/components/profile/EditProfileModal";
 import SkillsEditModal from "@/components/profile/SkillsEditModal";
 import AddPortfolioModal from "@/components/portfolio/AddPortfolioModal";
 import EditPortfolioModal from "@/components/portfolio/EditPortfolioModal";
+import DevelopersWorkedSection from "@/components/profile/DeveloperWorkedSection";
+import { useAuth } from "@/store/useAuth";
 
 
 interface Portfolio {
@@ -28,6 +30,7 @@ export default function ProfilePage() {
   const params = useParams();
   const role = params.role as string;
   const id = params.id as string;
+  const { user } = useAuth();
 
   const [view, setView] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -180,13 +183,48 @@ export default function ProfilePage() {
             }
 
             if (section.type === "projects") {
+
+              const isOwner = view.id === user?.id;
+
               return (
-                <section key={i} className="border-t border-gray-100 pt-12">
-                  <h3 className="text-lg font-light tracking-tight text-gray-900 
-                    mb-8">
+                <section
+                  key={i}
+                  className="border-t border-gray-100 pt-12"
+                >
+
+                  <h3 className="text-lg font-light tracking-tight text-gray-900 mb-8">
                     Projects
                   </h3>
-                  <ProjectsSection projects={section.data} />
+
+                  <ProjectsSection
+                    projects={section.data}
+                    canCreate={
+                      role === "founder" &&
+                      isOwner
+                    }
+                    isOwner={isOwner}
+                    onCreated={fetchProfile}
+                  />
+
+                </section>
+              );
+            }
+
+            if (section.type === "developers") {
+              return (
+                <section
+                  key={i}
+                  className="border-t border-gray-100 pt-12"
+                >
+
+                  <h3 className="text-lg font-light tracking-tight text-gray-900 mb-8">
+                    Developers Worked With
+                  </h3>
+
+                  <DevelopersWorkedSection
+                    developers={section.data}
+                  />
+
                 </section>
               );
             }

@@ -19,117 +19,78 @@ export async function POST(req: NextRequest) {
     }
     const user = verifyToken(token);
 
-    if (user.activeRole !=="developer") {
-
+    if (user.activeRole !== "developer") {
       return NextResponse.json(
-        {
-          error:
-            "Only developers can apply",
-        },
-        {
-          status: 403,
-        }
+        { error: "Only developers can apply", },
+        { status: 403, }
       );
     }
     const body = await req.json();
     const projectId = Number(body.projectId);
 
     if (!projectId) {
-
       return NextResponse.json(
-        {
-          error:
-            "Invalid project",
-        },
-        {
-          status: 400,
-        }
+        { error: "Invalid project", },
+        { status: 400, }
       );
     }
-
     console.log("Application poject ID:", projectId);
 
-
-    const project =
-      await db.query.projects.findFirst({
-        where: eq(
-          projects.id,
-          projectId
-        ),
-      });
+    const project = await db.query.projects.findFirst({
+      where: eq(projects.id, projectId),
+    });
 
     if (!project) {
-
       return NextResponse.json(
-        {
-          error:
-            "Project not found",
-        },
-        {
-          status: 404,
-        }
+        { error: "Project not found", },
+        { status: 404, }
       );
     }
 
+    //BLOCK OWNER
     if (project.founderId === user.id) {
-
       return NextResponse.json(
-        {
-          error:
-            "You cannot apply to your own project",
-        },
-        {
-          status: 403,
-        }
+        { error: "You cannot apply to your own project", },
+        { status: 403, }
       );
     }
 
-    const existingApplication =
-      await db.query.applications.findFirst({
-        where: and(
-          eq(applications.projectId,projectId),
+    const existing = await db.query.applications.findFirst({
+      where: and(
+        eq(applications.projectId, projectId),
+        eq(applications.developerId, user.id)
+      ),
+    });
 
-          eq(applications.developerId,user.id)
-        ),
-      });
-
-    if (existingApplication) {
-
+    if (existing) {
       return NextResponse.json(
-        {
-          error:
-            "You already applied to this project",
-        },
-        {
-          status: 400,
-        }
+        { error: "You already applied to this project", },
+        { status: 400, }
       );
     }
 
-
-    
     const newApplication = await db
       .insert(applications)
       .values({
-        projectId,
+        projectId: project.id,
         developerId: user.id,
         proposalMessage: body.proposalMessage,
         proposedPrice: body.proposedPrice,
-        deliveryTime: body.deliveryTime,
+        currency: body.currency,
+        deliveryValue: body.deliveryValue,
+        deliveryUnit: body.deliveryUnit,
       })
       .returning()
-    
+
     return NextResponse.json(newApplication[0]);
 
   } catch (error) {
 
-    console.log("Error in application route:",error)
+    console.log("Error in application route:", error)
 
     return NextResponse.json(
       { error: "Failed to submit proposal" },
       { status: 500 }
     )
-
   }
-
 }

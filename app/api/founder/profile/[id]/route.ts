@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { verifyToken } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { founderProfiles, projects, users } from "@/db/schema";
+import { contracts, developerProfiles, founderProfiles, projects, users } from "@/db/schema";
 
 
 export async function GET(
@@ -33,10 +33,35 @@ export async function GET(
       where: eq(projects.founderId, userId),
     });
 
+    const hiredContracts = await db.query.contracts.findMany({
+      where: eq(contracts.founderId, userId),
+    });
+
+    const developerIds = [...new Set(hiredContracts.map((c) => c.developerId))];
+
+    const hiredDevelopers = await Promise.all(
+      developerIds.map(async (developerId) => {
+        const user = await db.query.users.findFirst({
+          where: eq(users.id, developerId),
+        });
+
+        const profile = await db.query.developerProfiles.findFirst({
+          where: eq(developerProfiles.userId, developerId),
+        });
+
+        return {
+          id: developerId,
+          name: user?.name || "Developer",
+          profileImage: profile?.profileImage || null,
+        };
+      })
+    );
+
     return NextResponse.json({
       user,
       founderProfile,
       projects: userProjects,
+      hiredDevelopers,
     });
 
 
@@ -68,7 +93,7 @@ export async function PATCH(
     console.log("USER FOUNDER DETAILS:", user);
     const { id } = await params;
 
-    
+
     const body = await req.json();
 
 

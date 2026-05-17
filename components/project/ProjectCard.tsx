@@ -1,50 +1,122 @@
 import Link from "next/link"
 
-interface ProjectCardProps {
-  project: {
-    id: number
-    title: string
-    description: string
-    budgetRange: string
-    techStack: string
-  }
-}
+type Project = {
+  id: number;
+  founderId: number;
+  title: string;
+  description: string;
+  budgetMin: number;
+  budgetMax: number;
+  currency: string;
+  timelineValue: number;
+  timelineUnit: string;
+  techStack: string[];
+  experienceLevel: string;
+  status: string;
+};
 
-export default function ProjectCard({ project }: ProjectCardProps) {
+type Props = {
+  project: Project;
+  isOwner?: boolean;
+};
+
+export default function ProjectCard({
+  project,
+  isOwner = false,
+}: Props) {
 
   return (
 
-    <div className="border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all duration-300 bg-white group">
+    <div className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
 
-      <h2 className="text-lg font-semibold text-gray-900">
-        {project.title}
-      </h2>
+      {/* HEADER */}
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
 
-      <p className="text-gray-600 mt-3 line-clamp-2 text-sm">
-        {project.description}
-      </p>
+          <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">
+            {project.title}
+          </h2>
 
-      <div className="flex flex-wrap gap-3 mt-5">
+          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 capitalize">
+            {project.status}
+          </span>
+        </div>
 
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 text-xs font-medium rounded-full">
-          💰 {project.budgetRange}
+        <p className="text-sm text-gray-600 line-clamp-3">
+          {project.description}
+        </p>
+
+      </div>
+
+      {/* META */}
+      <div className="mt-5 flex flex-wrap gap-2">
+        {/* BUDGET */}
+        <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
+          💰 {" "}
+          {project.currency}
+          {" "}
+          {project.budgetMin}
+          -
+          {project.budgetMax}
         </span>
 
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-300 text-gray-600  text-xs font-medium rounded-full">
-          ⚙️ {project.techStack}
+        {/* TIMELINE */}
+        <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+
+          ⏳
+          {" "}
+          {project.timelineValue}
+          {" "}
+          {project.timelineUnit}
+        </span>
+
+        {/* EXPERIENCE */}
+
+        <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium capitalize">
+
+          🚀
+          {" "}
+          {project.experienceLevel}
         </span>
 
       </div>
 
-      <Link
-        href={`/developer/projects/${project.id}`}
-        className="text-blue-600 hover:text-blue-800 font-medium mt-4 inline-flex items-center gap-1 group/link transition"
-      >
-        View Project →
-      </Link>
+      {/* SKILLS */}
+
+      <div className="flex flex-wrap gap-2 mt-4">
+        {project.techStack?.slice(0, 4).map((skill, i) => (
+
+          <span
+            key={i}
+            className="px-2 py-1 rounded-md border text-xs bg-gray-50"
+          >
+            {skill}
+          </span>
+
+        ))}
+
+      </div>
+
+      {/* ACTION */}
+      <div className="mt-6">
+        <Link
+          href={
+            isOwner
+              ? `/founder/projects/${project.id}`
+              : `/projects/${project.id}`
+          }
+          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800"
+        >
+
+          {isOwner
+            ? "Manage Project →"
+            : "View Project →"}
+
+        </Link>
+
+      </div>
 
     </div>
-
-  )
+  );
 
 }

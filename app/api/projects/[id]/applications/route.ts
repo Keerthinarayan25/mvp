@@ -1,44 +1,114 @@
 import { db } from "@/db";
-import { applications, developerProfiles, users } from "@/db/schema";
+import { applications, projects, users, } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
+export async function GET(
+  req: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ id: string }>;
+  }
+) {
 
-
-
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-
-  const {id} = await params;
   try {
+
+    const { id } = await params;
+
     const projectId = Number(id);
-    const result = await db
-    .select({
-      applicationId: applications.id,
-      proposalMessage: applications.proposalMessage,
-      proposedPrice: applications.proposedPrice,
-      deliveryTime: applications.deliveryTime,
 
-      developerId: users.id,
-      developerName: users.name,
-    })
-    .from(applications)
-    .innerJoin(users, eq(applications.developerId,users.id))
-    .leftJoin(developerProfiles,
-      eq(developerProfiles.userId, users.id)
-    )
-    .where(eq(applications.projectId, projectId));
+    if (isNaN(projectId)) {
+      return NextResponse.json(
+        { error: "Invalid project id", },
+        { status: 400, }
+      );
+    }
 
-    return NextResponse.json(result);
+    const token = req.cookies.get("token")?.value;
 
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized", },
+        { status: 401, }
+      );
+    }
+
+    const user = verifyToken(token);
+
+    // ONLY FOUNDERS
+    if (user.activeRole !== "founder") {
+
+      return NextResponse.json(
+        { error: "Forbidden", },
+        { status: 403, }
+      );
+    }
+
+    const project = await db.query.projects.findFirst({
+      where: eq(projects.id, projectId),
+    });
+
+    if (!project) {
+      return NextResponse.json(
+        { error: "Project not found", },
+        { status: 404, }
+      );
+    }
+
+    if (project.founderId !== user.id) {
+      return NextResponse.json(
+        { error: "Not your project", },
+        { status: 403, }
+      );
+    }
+    const projectApplications =
+      await db.query.applications.findMany({
+        where: eq(applications.projectId, projectId),
+      });
+
+
+    const formattedApplications =
+      await Promise.all(
+        projectApplications.map(
+          async (app) => {
+            const developer =
+              await db.query.users.findFirst({
+                where: eq(users.id, app.developerId),
+              });
+
+            return {
+              id: app.id,
+              proposalMessage: app.proposalMessage,
+              proposedPrice: app.proposedPrice,
+              currency: app.currency,
+              deliveryValue: app.deliveryValue,
+              deliveryUnit: app.deliveryUnit,
+              status: app.status,
+              developer: {
+                id: developer?.id,
+                name: developer?.name,
+              },
+            };
+          }
+        )
+      );
+
+    return NextResponse.json({
+      id: project.id,
+      title: project.title,
+      description: project.description,
+      applications: formattedApplications,
+    });
 
   } catch (error) {
+    console.log("APPLICATION FETCH ERROR:", error
+    );
 
-    console.log("Error in application fetch:",error);
     return NextResponse.json(
-      { error: "Failed to fetch applications" },
-      { status: 500 }
-    )
-    
+      { error: "Failed to fetch applications", },
+      { status: 500, }
+    );
   }
-
 }
