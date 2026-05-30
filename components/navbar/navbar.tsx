@@ -31,7 +31,7 @@ export default function Navbar() {
           <>
             <Link href="/developer/contracts">My Work</Link>
             <Link href="/developer/dashboard">Dashboard</Link>
-            <Link href="/developer/projects">Projects</Link>
+            <Link href="/projects">Projects</Link>
           </>
         )}
 

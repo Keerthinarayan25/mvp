@@ -114,6 +114,8 @@ export const contracts = pgTable("contracts", {
   founderId: integer("founder_id").references(() => users.id).notNull(),
   agreedprice: integer("agreed_price"),
   currency: varchar("currency", { length: 10 }).default("USD"),
+  deliveryValue: integer("delivery_value"),
+  deliveryUnit: timelineUnitEnum("delivery_unit"),
   deadline: timestamp("deadline"),
   status: contractStatusEnum("status").default("active"),
   createdAt: timestamp("created_at").defaultNow(),

@@ -15,6 +15,13 @@
       "when": 1779014683645,
       "tag": "0001_acoustic_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780068012047,
+      "tag": "0002_thick_warlock",
+      "breakpoints": true
     }
   ]
 }

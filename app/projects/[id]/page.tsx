@@ -1,5 +1,6 @@
 "use client"
 
+import ProposalForm from "@/components/project/ProposalForm";
 import { useAuth } from "@/store/useAuth"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -24,11 +25,7 @@ export default function ProjectDetailPage() {
   const { user } = useAuth();
   const [project, setproject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [proposal, setProposal] = useState("");
-  const [price, setPrice] = useState("");
-  const [deliveryValue, setDeliveryValue] = useState("");
-  const [deliveryUnit, setDeliveryUnit] = useState("weeks");
+
 
   useEffect(() => {
     fetch(`/api/projects/${id}`)
@@ -50,49 +47,6 @@ export default function ProjectDetailPage() {
 
   const isOwner = user?.id === project.founderId;
   const canApply = user && user.activeRole === "developer" && !isOwner;
-
-  const handleApply = async (e: React.SyntheticEvent<HTMLElement>) => {
-    e.preventDefault()
-
-    try {
-      setSubmitting(true);
-      const res = await fetch("/api/applications", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          projectId: project.id,
-          proposalMessage: proposal,
-          proposedPrice: Number(price),
-          currency: project.currency,
-          deliveryValue: Number(deliveryValue),
-          deliveryUnit,
-        }),
-      })
-
-      const data = await res.json();
-
-      if (res.ok) {
-        alert("Proposal submitted ✅")
-      } else {
-        alert(data.error || "Failed to apply");
-        return;
-      }
-
-      setProposal("");
-      setPrice("");
-      setDeliveryValue("");
-      setDeliveryUnit("weeks");
-
-
-    } catch (error) {
-      alert("Something went wrong");
-      console.log("ERROR in /projects/[id]:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
 
   return (
@@ -197,85 +151,11 @@ export default function ProjectDetailPage() {
             Submit Proposal
           </h2>
 
-          <form
-            onSubmit={handleApply}
-            className="space-y-4"
-          >
-            <textarea
-              required
-              value={proposal}
-              placeholder="Write proposal..."
-              className="w-full border rounded-lg p-3"
-              onChange={(e) =>
-                setProposal(
-                  e.target.value
-                )
-              }
-            />
-            <input
-              required
-              type="number"
-              value={price}
-              placeholder="Your Price"
-              className="w-full border rounded-lg p-3"
-              onChange={(e) =>
-                setPrice(
-                  e.target.value
-                )
-              }
-            />
-            <div className="flex gap-3">
+          <ProposalForm
+            projectId={project.id}
+            currency={project.currency}
+          />
 
-              <input
-                required
-                type="number"
-                value={deliveryValue}
-                placeholder="Delivery Time"
-                className="flex-1 border rounded-lg p-3"
-                onChange={(e) =>
-                  setDeliveryValue(
-                    e.target.value
-                  )
-                }
-              />
-
-              <select
-                value={deliveryUnit}
-                onChange={(e) =>
-                  setDeliveryUnit(
-                    e.target.value
-                  )
-                }
-                className="border rounded-lg p-3"
-              >
-                <option value="days">
-                  Days
-                </option>
-
-                <option value="weeks">
-                  Weeks
-                </option>
-
-                <option value="months">
-                  Months
-                </option>
-
-              </select>
-
-            </div>
-
-            <button
-              disabled={submitting}
-              className="bg-black text-white px-6 py-3 rounded-lg disabled:opacity-50"
-            >
-
-              {submitting
-                ? "Submitting..."
-                : "Submit Proposal"}
-
-            </button>
-
-          </form>
 
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import ApplicationCard from "@/components/Application/ApplicationCard";
 import { useParams } from "next/navigation";
 
 import { useEffect, useState, } from "react";
@@ -25,7 +26,7 @@ type Project = {
   applications: Application[];
 };
 
-export default function FounderProjectPage() {
+export default function ProjectApplicationPage() {
 
   const { id } = useParams();
   const [project, setProject] = useState<Project | null>(null);
@@ -42,6 +43,29 @@ export default function FounderProjectPage() {
       });
 
   }, [id]);
+
+  const handleHire = async (
+    applicationId: number
+  ) => {
+
+    const res = await fetch(
+      `/api/applications/${applicationId}/hire`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    alert("Developer hired ✅");
+
+    window.location.reload();
+  };
 
 
   if (loading) {
@@ -91,52 +115,11 @@ export default function FounderProjectPage() {
 
           project.applications?.map(
             (app) => (
-              <div
+              <ApplicationCard
                 key={app.id}
-                className="border rounded-2xl p-5 space-y-4"
-              >
-
-                <div className="flex justify-between items-start">
-
-                  <div>
-
-                    <h3 className="font-semibold text-lg">
-                      {app.developer.name}
-                    </h3>
-
-                    <p className="text-sm text-gray-500 capitalize">
-                      {app.status}
-                    </p>
-
-                  </div>
-
-                  <div className="text-right">
-
-                    <p className="font-semibold">
-                      {app.currency}
-                      {" "}
-                      {app.proposedPrice}
-                    </p>
-
-                    <p className="text-sm text-gray-500">
-                      {app.deliveryValue}
-                      {" "}
-                      {app.deliveryUnit}
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <p className="text-gray-700">
-                  {app.proposalMessage}
-                </p>
-
-                <button className="bg-black text-white px-4 py-2 rounded-lg">
-                  Hire Developer
-                </button>
-
-              </div>
+                application={app}
+                onHire={handleHire}
+              />
             )
           )
         )}

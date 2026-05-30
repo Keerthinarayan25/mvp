@@ -102,7 +102,7 @@ export default function ProjectCard({
         <Link
           href={
             isOwner
-              ? `/founder/projects/${project.id}`
+              ? `/founder/projects/${project.id}/applications`
               : `/projects/${project.id}`
           }
           className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800"
