@@ -28,7 +28,7 @@ export default function ContractPage() {
     if (!id) return;
 
     try {
-      const res = await fetch(`/api/contracts/${id}`);
+      const res = await fetch(`/api/contracts/${id}/messages`);
 
       if (!res.ok) return;
       const data: Message[] = await res.json();
@@ -88,7 +88,7 @@ export default function ContractPage() {
 
     try {
 
-      await fetch("/api/messages", {
+      await fetch(`/api/contracts/${id}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
