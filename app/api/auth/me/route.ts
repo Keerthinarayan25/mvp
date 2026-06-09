@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       profileImage = profile?.profileImage || null;
     }
 
-    console.log("Auth ME:", user);
+    // console.log("Auth ME:", user);
 
     return NextResponse.json({
       id: user.id,

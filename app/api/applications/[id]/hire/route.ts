@@ -56,15 +56,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
 
     // Prevent double hiring
-    const existingContract = await db.query.contracts.findFirst(
-      { where: eq(contracts.projectId, project.id) }
-    );
+    // const existingContract = await db.query.contracts.findFirst(
+    //   { where: eq(contracts.projectId, project.id) }
+    // );
 
-    if (existingContract) {
-      return NextResponse.json(
-        { error: "Developer already hired" }, { status: 400 }
-      );
-    }
+    // if (existingContract) {
+    //   return NextResponse.json(
+    //     { error: "Developer already hired" }, { status: 400 }
+    //   );
+    // }
 
     // Create Contract
     const contract = await db.insert(contracts)

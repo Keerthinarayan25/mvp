@@ -19,6 +19,7 @@ export const applicationStatusEnum =
 export const contractStatusEnum =
   pgEnum("contract_status", [
     "active",
+    "awaiting_handoff",
     "completed",
     "cancelled",
   ]);
@@ -100,7 +101,7 @@ export const applications = pgTable("applications", {
   developerId: integer("developer_id").references(() => users.id).notNull(),
   proposalMessage: text("proposal_message").notNull(),
   proposedPrice: integer("proposed_price").notNull(),
-  currency: varchar("currency",{ length: 10 }).default("USD"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
   deliveryValue: integer("delivery_value"),
   deliveryUnit: timelineUnitEnum("delivery_unit"),
   status: applicationStatusEnum("status").default("pending"),
@@ -142,3 +143,33 @@ export const portfolios = pgTable("portfolios", {
   githubLink: varchar("github_link", { length: 255 })
 
 })
+
+
+export const deliveries = pgTable("deliveries", {
+  id: serial("id").primaryKey(),
+  contractId: integer("contract_id").
+    references(() => contracts.id).
+    notNull(),
+
+  githubUrl: varchar("github_url", { length: 500 }),
+  liveUrl: varchar("live_url", { length: 500 }),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+
+})
+
+
+export const handoffs = pgTable("handoffs", {
+  id: serial("id").primaryKey(),
+
+  contractId: integer("contract_id")
+    .references(() => contracts.id)
+    .notNull(),
+
+  sourceCodeUrl: varchar("source_code_url", { length: 500 }).notNull(),
+  documentationUrl: varchar("documentation_url", { length: 500 }),
+
+  notes: text("notes"),
+  createdAt: timestamp("created_at")
+    .defaultNow(),
+});
