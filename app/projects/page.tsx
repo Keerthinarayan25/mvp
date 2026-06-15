@@ -3,13 +3,20 @@
 import { useEffect, useState } from "react"
 import ProjectCard from "@/components/project/ProjectCard"
 
-interface Project {
-  id: number
+type Project = {
+  id: number;
+  founderId: number;
   title: string;
-  description: string
-  budgetRange: string
-  techStack: string
-}
+  description: string;
+  budgetMin: number;
+  budgetMax: number;
+  currency: string;
+  timelineValue: number;
+  timelineUnit: string;
+  techStack: string[];
+  experienceLevel: string;
+  status: string;
+};
 
 export default function ProjectsPage() {
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "./lib/auth";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
 
   const token = req.cookies.get("token")?.value;
 
@@ -26,14 +26,14 @@ export function middleware(req: NextRequest) {
     const user = verifyToken(token);
 
     if (
-      user.role === "developer" &&
+      user.activeRole === "developer" &&
       req.nextUrl.pathname.startsWith("/founder")
     ) {
       return NextResponse.redirect(new URL("/developer/dashboard", req.url));
     }
 
     if (
-      user.role === "founder" &&
+      user.activeRole === "founder" &&
       req.nextUrl.pathname.startsWith("/developer")
     ) {
       return NextResponse.redirect(new URL("/founder/dashboard", req.url));
