@@ -4,12 +4,14 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import DeliveryCard from "@/components/contracts/DeliveryCard";
 import DeliveryForm from "@/components/contracts/DeliveryForm";
-import ApproveButtons from "@/components/contracts/ApproveButtons";
 import ContractStatusBadge from "@/components/contracts/ContractStatusBadge";
 import { useAuth } from "@/store/useAuth";
 import HandoffForm from "@/components/contracts/HandoffForm";
 import HandoffCard from "@/components/contracts/HandoffCard";
 import CancelContractButton from "@/components/contracts/CancelContractButton";
+import FundEscrowButton from "@/components/contracts/FundEscrowButton";
+import UnlockSourceCodeButton from "@/components/contracts/UnlockSourceCodeButton";
+
 
 
 interface Message {
@@ -271,13 +273,40 @@ export default function ContractPage() {
               {handoff && <HandoffCard handoff={handoff} />}
 
               {user?.activeRole === "founder" &&
-                contract?.contract?.status === "active" &&
-                contract.contract.founderId === user?.id &&
+                contract?.contract?.status === "submitted" &&
+                contract?.contract?.founderId === user?.id &&
                 delivery.length > 0 && (
 
-                  <ApproveButtons
-                    contractId={contract.contract.id}
-                    onRefresh={() => fetchContract()} />
+                  <button
+                    onClick={async () => {
+                      await fetch(`/api/contracts/${contract.contract.id}/request-source`,
+                        {
+                          method: "POST",
+                        }
+                      );
+                      fetchContract();
+
+                    }}
+                    className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+                  >
+                    Request Final Source Code
+                  </button>
+
+                )}
+
+              {user?.activeRole === "founder" &&
+                contract?.contract?.status ===
+                "pending_funding" && (
+
+                  <FundEscrowButton
+                    contractId={
+                      contract.contract.id
+                    }
+                    onSuccess={() => {
+                      fetchContract();
+                    }}
+                  />
+
                 )}
 
               {user?.activeRole === "founder" &&
@@ -290,17 +319,20 @@ export default function ContractPage() {
 
               {user?.activeRole === "founder" &&
                 contract?.contract?.status === "awaiting_handoff" &&
-                handoff && (
-                  <button
-                    onClick={async () => {
-                      await fetch(`/api/contracts/${contract.contract.id}/complete`, { method: "POST" });
+                handoff &&
+                !handoff.unlocked && (
+
+                  <UnlockSourceCodeButton
+                    contractId={contract.contract.id}
+                    onUnlocked={() => {
                       fetchContract();
+                      fetchHandoff();
                     }}
-                    className="bg-green-600 text-white px-5 py-2 rounded-lg"
-                  >
-                    Confirm Handoff
-                  </button>
+                  />
+
                 )}
+
+
             </>
           ) : (
             <p className="text-gray-400 text-sm">Loading contract...</p>

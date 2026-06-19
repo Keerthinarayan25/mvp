@@ -76,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         currency: application.currency,
         deliveryValue: application.deliveryValue,
         deliveryUnit: application.deliveryUnit,
-        status: "active",
+        status: "pending_funding",
       })
       .returning();
 

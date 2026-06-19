@@ -3,6 +3,7 @@ type Props = {
     sourceCodeUrl: string;
     documentationUrl?: string;
     notes?: string;
+    unlocked: boolean;
     createdAt: string;
   };
 };
@@ -10,6 +11,26 @@ type Props = {
 export default function HandoffCard({
   handoff,
 }: Props) {
+
+  if (!handoff.unlocked) {
+    return (
+      <div className="border rounded-xl p-5">
+
+        <h2 className="font-semibold">
+          Final Source Uploaded
+        </h2>
+
+        <p className="text-gray-500 mt-2">
+          Source code is locked.
+        </p>
+
+        <p className="text-sm text-orange-600 mt-2">
+          Release escrow to unlock source code.
+        </p>
+
+      </div>
+    );
+  }
 
   return (
     <div className="border rounded-xl p-5 space-y-4">
@@ -23,7 +44,7 @@ export default function HandoffCard({
         target="_blank"
         className="block text-blue-600 underline"
       >
-        Download Source Code
+        Source Code
       </a>
 
       {handoff.documentationUrl && (
@@ -49,6 +70,8 @@ export default function HandoffCard({
           handoff.createdAt
         ).toLocaleString()}
       </p>
+      Escrow Released ✅
+      Contract Completed ✅
 
     </div>
   );

@@ -77,6 +77,7 @@ export async function POST(req: NextRequest, { params }:
           sourceCodeUrl: body.sourceCodeUrl,
           documentationUrl: body.documentationUrl,
           notes: body.notes,
+          unlocked:false,
         })
         .returning();
 

@@ -1,9 +1,9 @@
 type Props = {
   status:
-    | "active"
-    | "awaiting_handoff"
-    | "completed"
-    | "cancelled";
+  | "active"
+  | "awaiting_handoff"
+  | "completed"
+  | "cancelled";
 };
 
 export default function ContractStatusBadge({
@@ -11,17 +11,15 @@ export default function ContractStatusBadge({
 }: Props) {
 
   const styles: Record<string, string> = {
-    active:
-      "bg-blue-100 text-blue-700",
+    pending_funding: "bg-yellow-100 text-yellow-700",
 
-    awaiting_handoff:
-      "bg-yellow-100 text-yellow-700",
+    active: "bg-blue-100 text-blue-700",
 
-    completed:
-      "bg-green-100 text-green-700",
+    awaiting_handoff: "bg-yellow-100 text-yellow-700",
 
-    cancelled:
-      "bg-red-100 text-red-700",
+    completed: "bg-green-100 text-green-700",
+
+    cancelled: "bg-red-100 text-red-700",
   };
 
   return (

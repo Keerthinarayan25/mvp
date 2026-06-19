@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp, pgEnum, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, pgEnum, integer, boolean } from "drizzle-orm/pg-core";
 
 export const roleEnum = pgEnum("role", ["developer", "founder"]);
 
@@ -18,7 +18,9 @@ export const applicationStatusEnum =
 
 export const contractStatusEnum =
   pgEnum("contract_status", [
+    "pending_funding",
     "active",
+    "submitted",
     "awaiting_handoff",
     "completed",
     "cancelled",
@@ -35,6 +37,14 @@ export const experienceLevelEnum = pgEnum("experience_level", [
   "entry",
   "intermediate",
   "expert",
+]);
+
+
+export const escrowStatusEnum = pgEnum("escrow_status", [
+  "pending",
+  "funded",
+  "released",
+  "refunded",
 ]);
 
 export const users = pgTable("users", {
@@ -151,7 +161,6 @@ export const deliveries = pgTable("deliveries", {
     references(() => contracts.id).
     notNull(),
 
-  githubUrl: varchar("github_url", { length: 500 }),
   liveUrl: varchar("live_url", { length: 500 }),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -170,6 +179,34 @@ export const handoffs = pgTable("handoffs", {
   documentationUrl: varchar("documentation_url", { length: 500 }),
 
   notes: text("notes"),
-  createdAt: timestamp("created_at")
-    .defaultNow(),
+  unlocked: boolean("unlocked").default(false),
+  releasedAt: timestamp("released_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+
+export const escrows = pgTable("escrows", {
+  id: serial("id").primaryKey(),
+
+  contractId: integer("contract_id").references(() => contracts.id).notNull(),
+
+  founderId: integer("founder_id").references(() => users.id).notNull(),
+
+  developerId: integer("developer_id").references(() => users.id).notNull(),
+
+  amount: integer("amount").notNull(),
+
+  currency: varchar("currency", { length: 10, }).default("INR"),
+
+  razorpayOrderId: varchar("razorpay_order_id", { length: 255 }),
+
+  razorpayPaymentId: varchar("razorpay_payment_id", { length: 255 }),
+
+  status: escrowStatusEnum("status").default("pending"),
+
+  fundedAt: timestamp("funded_at"),
+
+  releasedAt: timestamp("released_at"),
+
+  createdAt: timestamp("created_at").defaultNow(),
 });

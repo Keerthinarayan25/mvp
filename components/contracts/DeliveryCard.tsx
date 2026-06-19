@@ -2,7 +2,6 @@ type Props = {
   delivery: {
     id: number;
     liveUrl: string;
-    githubUrl: string;
     notes: string;
     createdAt: string;
   };
@@ -18,7 +17,7 @@ export default function DeliveryCard({
       <div className="flex justify-between">
 
         <h3 className="font-semibold">
-          Delivery #{delivery.id}
+          Delivery
         </h3>
 
         <span className="text-sm text-gray-500">
@@ -39,15 +38,6 @@ export default function DeliveryCard({
         </a>
       )}
 
-      {delivery.githubUrl && (
-        <a
-          href={delivery.githubUrl}
-          target="_blank"
-          className="block text-blue-600 underline"
-        >
-          Github Repository
-        </a>
-      )}
 
       {delivery.notes && (
         <p className="text-gray-700">

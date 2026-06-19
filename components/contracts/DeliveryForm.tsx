@@ -13,7 +13,6 @@ export default function DeliveryForm({
 }: Props) {
 
   const [liveUrl, setLiveUrl] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +31,6 @@ export default function DeliveryForm({
           },
           body: JSON.stringify({
             liveUrl,
-            githubUrl,
             notes,
           }),
         }
@@ -45,7 +43,6 @@ export default function DeliveryForm({
       }
 
       setLiveUrl("");
-      setGithubUrl("");
       setNotes("");
 
       onDelivered();
@@ -73,13 +70,6 @@ export default function DeliveryForm({
         className="w-full border p-3 rounded"
       />
 
-      <input
-        required
-        value={githubUrl}
-        onChange={(e) => setGithubUrl(e.target.value)}
-        placeholder="Github URL"
-        className="w-full border p-3 rounded"
-      />
 
       <textarea
         value={notes}
