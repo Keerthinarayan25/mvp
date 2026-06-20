@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
           id: contracts.id,
           projectId: projects.id,
           projectTitle: projects.title,
+          description:projects.description,
+          techStack:projects.techStack,
 
           developerId: contracts.developerId,
           developerName: developer.name,
@@ -67,6 +69,8 @@ export async function GET(req: NextRequest) {
           id: contracts.id,
           projectId: projects.id,
           projectTitle: projects.title,
+          description:projects.description,
+          techStack:projects.techStack,
 
           developerId: contracts.developerId,
           developerName: developer.name,

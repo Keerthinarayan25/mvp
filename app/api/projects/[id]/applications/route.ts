@@ -56,6 +56,7 @@ export async function GET(
         { status: 404, }
       );
     }
+    console.log("PROJECTS list of application:", project);
 
     if (project.founderId !== user.id) {
       return NextResponse.json(
@@ -97,8 +98,22 @@ export async function GET(
 
     return NextResponse.json({
       id: project.id,
+      founderId: project.founderId,
+
       title: project.title,
       description: project.description,
+
+      budgetMin: project.budgetMin,
+      budgetMax: project.budgetMax,
+      currency: project.currency,
+
+      timelineValue: project.timelineValue,
+      timelineUnit: project.timelineUnit,
+
+      techStack: project.techStack,
+
+      experienceLevel: project.experienceLevel,
+      status: project.status,
       applications: formattedApplications,
     });
 

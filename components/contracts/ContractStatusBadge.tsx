@@ -1,5 +1,6 @@
 type Props = {
   status:
+  |"pending_funding"
   | "active"
   | "awaiting_handoff"
   | "completed"

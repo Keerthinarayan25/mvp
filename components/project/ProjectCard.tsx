@@ -1,4 +1,5 @@
 import Link from "next/link"
+import StatusBadge from "./Statusbadge";
 
 type Project = {
   id: number;
@@ -25,76 +26,51 @@ export default function ProjectCard({
   isOwner = false,
 }: Props) {
 
+  console.log("Projects in project card:", project);
+
   return (
 
-    <div className="border border-gray-200 rounded-2xl p-5 bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+    <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition">
 
       {/* HEADER */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between gap-3">
-
-          <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">
+      <div className=" flex flex-col lg:flex-row justify-between gap-4 ">
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 " >
             {project.title}
-          </h2>
+          </h1>
 
-          <span className="text-xs px-2 py-1 rounded-full bg-gray-100 capitalize">
-            {project.status}
-          </span>
+          <p className=" mt-3 text-slate-600  leading-relaxed  "   >
+            {project.description}
+          </p>
         </div>
 
-        <p className="text-sm text-gray-600 line-clamp-3">
-          {project.description}
-        </p>
-
+        <div className="flex-shrink-0">
+          <StatusBadge status={project.status} />
+        </div>
       </div>
 
-      {/* META */}
-      <div className="mt-5 flex flex-wrap gap-2">
-        {/* BUDGET */}
-        <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-medium">
-          💰 {" "}
-          {project.currency}
-          {" "}
-          {project.budgetMin}
-          -
-          {project.budgetMax}
+      <div className=" mt-5  flex flex-wrap  gap-x-8 gap-y-2 text-sm text-slate-600" >
+        <span>
+          💰 {project.currency} {project.budgetMin} - {project.budgetMax}
         </span>
 
-        {/* TIMELINE */}
-        <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
-
-          ⏳
-          {" "}
-          {project.timelineValue}
-          {" "}
-          {project.timelineUnit}
+        <span>
+          ⏳ {project.timelineValue} {project.timelineUnit}
         </span>
 
-        {/* EXPERIENCE */}
-
-        <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium capitalize">
-
-          🚀
-          {" "}
-          {project.experienceLevel}
+        <span>
+          🚀 {project.experienceLevel}
         </span>
-
       </div>
 
-      {/* SKILLS */}
-
-      <div className="flex flex-wrap gap-2 mt-4">
-        {project.techStack?.slice(0, 4).map((skill, i) => (
-
+      <div className="mt-5 flex flex-wrap  gap-2  "       >
+        {(project.techStack ?? []).map((tech) => (
           <span
-            key={i}
-            className="px-2 py-1 rounded-md border text-xs bg-gray-50"
-          >
-            {skill}
+            key={tech}
+            className="  px-3 py-1 rounded-md  bg-slate-100 text-slate-700  text-sm ">
+            {tech}
           </span>
-
         ))}
-
       </div>
 
       {/* ACTION */}

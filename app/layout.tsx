@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar/navbar";
 import AuthProvider from "@/components/providers/AuthProvider";
 import Script from "next/script";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           {children}
+          <Toaster richColors />
         </AuthProvider>
       </body>
     </html>

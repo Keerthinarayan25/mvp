@@ -1,9 +1,11 @@
 "use client";
 
 import ApplicationCard from "@/components/Application/ApplicationCard";
+import ProjectCard from "@/components/project/ProjectCard";
 import { useParams } from "next/navigation";
 
 import { useEffect, useState, } from "react";
+import { toast } from "sonner";
 
 type Application = {
   id: number;
@@ -21,8 +23,17 @@ type Application = {
 
 type Project = {
   id: number;
+  founderId: number;
   title: string;
   description: string;
+  budgetMin: number;
+  budgetMax: number;
+  currency: string;
+  timelineValue: number;
+  timelineUnit: string;
+  techStack: string[];
+  experienceLevel: string;
+  status: string;
   applications: Application[];
 };
 
@@ -44,6 +55,8 @@ export default function ProjectApplicationPage() {
 
   }, [id]);
 
+  console.log("PROJECTS in founder page:", project);
+
   const handleHire = async (
     applicationId: number
   ) => {
@@ -62,7 +75,7 @@ export default function ProjectApplicationPage() {
       return;
     }
 
-    alert("Developer hired ✅");
+    toast.success("Developer hired successfully");
 
     window.location.reload();
   };
@@ -88,16 +101,7 @@ export default function ProjectApplicationPage() {
     <div className="max-w-5xl mx-auto py-10 space-y-8">
 
       {/* PROJECT */}
-      <div className="border rounded-2xl p-6">
-        <h1 className="text-3xl font-bold">
-          {project.title}
-        </h1>
-
-        <p className="text-gray-600 mt-4">
-          {project.description}
-        </p>
-
-      </div>
+      <ProjectCard key={project.id} project={project} />
 
       {/* APPLICATIONS */}
       <div className="space-y-5">
