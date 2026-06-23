@@ -1,17 +1,31 @@
 
 
 export default function LinksCard({ links }: { links: any[] }) {
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm flex gap-4">
 
+  if (!links?.length) {
+    return (
+      <p className="text-sm text-slate-500">
+        No links added yet.
+      </p>
+    );
+  }
+  return (
+    <div className="space-y-3">
       {links.map((link, i) => (
         <a
           key={i}
           href={link.url}
           target="_blank"
-          className="px-4 py-2 border rounded-lg text-sm"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition"
         >
-          {link.label}
+          <span className="font-medium">
+            {link.label}
+          </span>
+
+          <span className="text-slate-400">
+            ↗
+          </span>
         </a>
       ))}
     </div>

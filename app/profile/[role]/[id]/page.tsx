@@ -119,8 +119,10 @@ export default function ProfilePage() {
 
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* HEADER */}
         <ProfileHeader
           name={view.name}
           image={view.image}
@@ -129,27 +131,44 @@ export default function ProfilePage() {
           onEdit={() => setShowEdit(true)}
         />
 
-        <div className="mt-16 space-y-16">
-          <section className="border-t border-gray-100 pt-12">
-            <AboutCard bio={view.about} />
-          </section>
+        {/* ABOUT + SOCIALS */}
+        <div className="grid lg:grid-cols-3 gap-6 mt-8">
 
-          <section className="border-t border-gray-100 pt-12">
-            <h3 className="text-lg font-light tracking-tight text-gray-900 
-                    mb-8">
-              Socials
-            </h3>
-            <LinksCard links={view.links} />
-          </section>
+          {/* LEFT SIDEBAR */}
+          <div className="space-y-6">
+
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-semibold mb-4">
+                Social Links
+              </h2>
+
+              <LinksCard links={view.links} />
+            </div>
+
+          </div>
+
+          {/* MAIN CONTENT */}
+          <div className="lg:col-span-2">
+
+            <div className="bg-white borderborder-slate-200 rounded-2xl p-6 shadow-sm">
+              <AboutCard bio={view.about} />
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* DYNAMIC SECTIONS */}
+        <div className="space-y-6 mt-8">
 
           {view.sections.map((section: any, i: number) => {
+
             if (section.type === "skills") {
               return (
-                <section key={i} className="border-t border-gray-100 pt-12">
-                  <h3 className="text-lg font-light tracking-tight text-gray-900 
-                    mb-8">
-                    Skills
-                  </h3>
+                <section
+                  key={i}
+                  className=" bg-white borderborder-slate-200 rounded-2xl p-6 shadow-sm "
+                >
                   <SkillsTags
                     skills={section.data}
                     onEdit={() => setShowSkillsEdit(true)}
@@ -160,22 +179,27 @@ export default function ProfilePage() {
 
             if (section.type === "portfolio") {
               return (
-                <section key={i} className="border-t border-gray-100 pt-12">
-                  <h3 className="text-lg font-light tracking-tight text-gray-900 
-                    mb-8">
-                    Portfolio
-                  </h3>
+                <section
+                  key={i}
+                  className="bg- border border-slate-200 rounded-2xl p-6 shadow-sm"
+                >
                   <PortfolioSection
                     portfolio={section.data}
                     onAdd={() => setShowAddPortfolio(true)}
-                    onEdit={(project) => setEditingPortfolio(project)}
+                    onEdit={(project) =>
+                      setEditingPortfolio(project)
+                    }
                     onDelete={async (id) => {
-                      const res = await fetch(`/api/portfolio/${id}`,
+                      const res = await fetch(
+                        `/api/portfolio/${id}`,
                         {
                           method: "DELETE",
                         }
                       );
-                      if (res.ok) fetchProfile();
+
+                      if (res.ok) {
+                        fetchProfile();
+                      }
                     }}
                   />
                 </section>
@@ -189,13 +213,8 @@ export default function ProfilePage() {
               return (
                 <section
                   key={i}
-                  className="border-t border-gray-100 pt-12"
+                  className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
                 >
-
-                  <h3 className="text-lg font-light tracking-tight text-gray-900 mb-8">
-                    Projects
-                  </h3>
-
                   <ProjectsSection
                     projects={section.data}
                     canCreate={
@@ -205,7 +224,6 @@ export default function ProfilePage() {
                     isOwner={isOwner}
                     onCreated={fetchProfile}
                   />
-
                 </section>
               );
             }
@@ -214,17 +232,11 @@ export default function ProfilePage() {
               return (
                 <section
                   key={i}
-                  className="border-t border-gray-100 pt-12"
+                  className=" bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
                 >
-
-                  <h3 className="text-lg font-light tracking-tight text-gray-900 mb-8">
-                    Developers Worked With
-                  </h3>
-
                   <DevelopersWorkedSection
                     developers={section.data}
                   />
-
                 </section>
               );
             }
@@ -232,53 +244,52 @@ export default function ProfilePage() {
             return null;
           })}
         </div>
+
+        {/* MODALS */}
+        {showEdit && (
+          <EditProfileModal
+            role={role}
+            onClose={() => setShowEdit(false)}
+            onSuccess={() => {
+              fetchProfile();
+              setShowEdit(false);
+            }}
+          />
+        )}
+
+        {showSkillsEdit && (
+          <SkillsEditModal
+            currentSkills={
+              view.sections.find(
+                (s: any) => s.type === "skills"
+              )?.data || []
+            }
+            onClose={() => setShowSkillsEdit(false)}
+            onSuccess={() => { fetchProfile(); }}
+          />
+        )}
+
+        {showAddPortfolio && (
+          <AddPortfolioModal
+            onClose={() => setShowAddPortfolio(false)}
+            onSuccess={() => {
+              fetchProfile();
+              setShowAddPortfolio(false);
+            }}
+          />
+        )}
+
+        {editingPortfolio && (
+          <EditPortfolioModal
+            project={editingPortfolio}
+            onClose={() => setEditingPortfolio(null)}
+            onUpdated={() => {
+              fetchProfile();
+              setEditingPortfolio(null);
+            }}
+          />
+        )}
       </div>
-
-      {showEdit && (
-        <EditProfileModal
-          role={role}
-          onClose={() => setShowEdit(false)}
-          onSuccess={() => {
-            fetchProfile();
-            setShowEdit(false);
-          }}
-        />
-      )}
-
-      {showSkillsEdit && (
-        <SkillsEditModal
-          currentSkills={
-            view.sections.find(
-              (s: any) =>
-                s.type === "skills"
-            )?.data || []
-          }
-
-          onClose={() => setShowSkillsEdit(false)}
-          onSuccess={() => { fetchProfile(); }}
-        />
-      )}
-
-      {showAddPortfolio && (
-        <AddPortfolioModal
-          onClose={() => setShowAddPortfolio(false)}
-          onSuccess={() => {
-            fetchProfile();
-            setShowAddPortfolio(false);
-          }}
-        />
-      )}
-
-      {editingPortfolio && (
-        <EditPortfolioModal
-          project={editingPortfolio}
-          onClose={() => setEditingPortfolio(null)}
-          onUpdated={() => {
-            fetchProfile();
-            setEditingPortfolio(null);
-          }}
-        />
-      )}
     </div>
   );
 }

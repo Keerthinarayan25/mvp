@@ -18,33 +18,43 @@ export default function DevelopersWorkedSection({
 
   if (!developers || developers.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 mb-3">
           Developers Worked With
         </h2>
 
-        <p className="text-sm text-gray-500">
-          No developers hired yet.
-        </p>
+        <div className="border border-dashed border-slate-300 rounded-xl p-8 text-center">
+          <p className="text-slate-500">
+            No developers hired yet.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div>
 
-      <h2 className="text-lg font-semibold mb-6">
-        Developers Worked With
-      </h2>
+      {/* Header */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-slate-900">
+          Developers Worked With
+        </h2>
 
-      <div className="grid md:grid-cols-2 gap-4">
+        <p className="text-sm text-slate-500 mt-1">
+          Developers you ve successfully collaborated with
+        </p>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
         {developers.map((developer) => (
 
           <Link
             key={developer.id}
             href={`/profile/developer/${developer.id}`}
-            className="border rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition"
+            className="flex items-center gap-4 p-4 borderborder-slate-200  rounded-2xl hover:border-blue-300 hover:shadow-md transition-all bg-white"
           >
 
             <Image
@@ -52,18 +62,18 @@ export default function DevelopersWorkedSection({
                 developer.profileImage ||
                 "/profile.svg"
               }
-              alt="developer"
-              width={50}
-              height={50}
-              className="rounded-full object-cover"
+              alt={developer.name}
+              width={60}
+              height={60}
+              className="w-14 h-14  rounded-full object-cover border border-slate-200"
             />
 
-            <div>
-              <h3 className="font-medium">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-slate-900 truncate">
                 {developer.name}
               </h3>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-500">
                 Developer
               </p>
             </div>
@@ -73,6 +83,7 @@ export default function DevelopersWorkedSection({
         ))}
 
       </div>
+
     </div>
   );
 }

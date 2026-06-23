@@ -78,7 +78,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    console.log("BODY OF DEVEOPER PROFILE:",body);
+    console.log("BODY OF DEVEOPER PROFILE:", body);
 
     const existing = await db.query.developerProfiles.findFirst({
       where: eq(developerProfiles.userId, user.id),
@@ -99,7 +99,6 @@ export async function PATCH(
         .where(
           and(
             eq(developerProfiles.userId, user.id),
-            eq(developerProfiles.id, Number(id))
           )
         )
         .returning();
@@ -117,8 +116,12 @@ export async function PATCH(
         .returning();
     }
 
-    // console.log(result[0]);
-    // console.log(typeof result[0].id);
+    console.log("PARAM ID:", id);
+    console.log("USER ID:", user.id);
+    console.log("EXISTING:", existing);
+
+    console.log(result[0]);
+    console.log(typeof result[0].id);
 
     return NextResponse.json(result[0]);
 

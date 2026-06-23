@@ -1,3 +1,4 @@
+import { Pencil, Trash2, ExternalLink, Plus } from "lucide-react";
 interface Portfolio {
   id: number;
   title: string;
@@ -21,76 +22,95 @@ export default function PortfolioSection({
 }: Props) {
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm space-y-4">
-
+    <div>
       {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h2 className="font-semibold text-lg">Portfolio</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className=" text-xl font-semibold text-slate-900" >
+            Portfolio
+          </h2>
 
-        <button
-          onClick={() => onAdd?.()}
-          className="bg-black text-white px-3 py-2 rounded-lg text-sm hover:opacity-90"
-        >
-          + Add Project
-        </button>
+          <p className="text-sm text-slate-500 mt-1">
+            Showcase your best work
+          </p>
+        </div>
+
+        {onAdd && (
+          <button
+            onClick={onAdd}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm ont-medium hover:bg-blue-700 transition"
+          >
+            <Plus size={16} />
+            Add Project
+          </button>
+        )}
       </div>
 
-      {/* EMPTY STATE */}
+      {/* EMPTY */}
       {portfolio.length === 0 ? (
-        <p className="text-sm text-gray-500">
-          No projects added yet.
-        </p>
+        <div
+          className=" border border-dashed border-slate-300 rounded-xl p-10 text-center"
+        >
+          <p className="text-slate-500">
+            No projects added yet.
+          </p>
+        </div>
       ) : (
-
-        /* GRID */
-        <div className="grid md:grid-cols-2 gap-4">
-
+        <div className=" grid md:grid-cols-2 gap-5 " >
           {portfolio.map((project) => (
             <div
               key={project.id}
-              className="bg-white rounded-2xl shadow-sm p-5 flex flex-col justify-between transition hover:shadow-md hover:-translate-y-1 relative group"
+              className=" border border-slate-200 rounded-2xl p-5 hover:shadow-lg hover:border-blue-200   transition-all "
             >
+              {/* ACTIONS */}
+              <div className="flex justify-end gap-2 mb-4">
+                {onEdit && (
+                  <button
+                    onClick={() => onEdit(project)}
+                    className=" p-2 rounded-lg hover:bg-slate-100 "
+                  >
+                    <Pencil
+                      size={16}
+                      className="text-slate-600"
+                    />
+                  </button>
+                )}
 
-              {/* DELETE / EDIT ACTIONS */}
-              <div className="absolute top-2 right-2 hidden group-hover:flex gap-2">
-
-                <button
-                  onClick={() => onEdit?.(project)}
-                  className="text-xs px-2 py-1 bg-gray-100 rounded hover:bg-gray-200"
-                >
-                  Edit
-                </button>
-
-                <button
-                  onClick={() => onDelete?.(project.id)}
-                  className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200"
-                >
-                  Delete
-                </button>
-
+                {onDelete && (
+                  <button
+                    onClick={() => onDelete(project.id)}
+                    className=" p-2 rounded-lg hover:bg-red-50 "
+                  >
+                    <Trash2
+                      size={16}
+                      className="text-red-600"
+                    />
+                  </button>
+                )}
               </div>
 
               {/* CONTENT */}
               <div>
-                <h3 className="text-md font-semibold mb-2">
+                <h3 className=" text-lg font-semibold text-slate-900 ">
                   {project.title}
                 </h3>
 
-                <p className="text-sm text-gray-600 line-clamp-3">
+                <p className=" mt-3 text-slate-600 text-sm leading-relaxed line-clamp-4 " >
                   {project.description}
                 </p>
               </div>
 
               {/* LINKS */}
-              <div className="flex gap-3 mt-5">
-
+              <div className="flex gap-3 mt-6">
                 {project.projectLink && (
                   <a
                     href={project.projectLink}
                     target="_blank"
-                    className="flex-1 text-center text-sm px-3 py-2 rounded-lg bg-black text-white hover:opacity-90"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3   py-2 rounded-lg border border-slate-200 text-sm hover:bg-slate-50"
                   >
-                    Live
+                    <ExternalLink size={15} />
+                    Live Demo
                   </a>
                 )}
 
@@ -98,20 +118,18 @@ export default function PortfolioSection({
                   <a
                     href={project.githubLink}
                     target="_blank"
-                    className="flex-1 text-center text-sm px-3 py-2 rounded-lg border hover:bg-gray-100"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-sm hover:bg-slate-50"
                   >
+
                     GitHub
                   </a>
                 )}
-
               </div>
-
             </div>
           ))}
-
         </div>
       )}
-
     </div>
   );
 }

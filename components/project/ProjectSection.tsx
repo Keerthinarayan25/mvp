@@ -37,66 +37,70 @@ export default function ProjectsSection({
   const [showCreate, setShowCreate] = useState(false);
 
   return (
+  <div>
 
-    <div className="bg-white rounded-2xl p-8 shadow-sm space-y-6">
+    {/* HEADER */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <div>
+        <h2 className="text-xl font-semibold text-slate-900">
+          Projects
+        </h2>
 
-          <h2 className="text-2xl font-bold text-gray-900">
-            Projects
-          </h2>
+        <p className="text-sm text-slate-500 mt-1">
+          {isOwner
+            ? "Projects you've posted"
+            : "Available opportunities"}
+        </p>
 
-          <p className="text-sm text-gray-500 mt-1">
-            {isOwner
-              ? "Projects you've posted"
-              : "Available opportunities"}
-          </p>
-        </div>
-
-        {canCreate && (
-          <Button
-            onClick={() => setShowCreate(true)}
-            className="rounded-lg"
-          >
-            + Create Project
-          </Button>
-        )}
       </div>
 
-      {/* EMPTY */}
-
-      {projects.length === 0 ? (
-        <div className="border rounded-2xl py-14 flex flex-col items-center justify-center">
-          <p className="text-gray-500 text-sm">
-            No projects available yet.
-          </p>
-        </div>
-
-      ) : (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              isOwner={isOwner}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* CREATE MODAL */}
-      {showCreate && (
-        <CreateProjectModal
-          onClose={() => setShowCreate(false)}
-          onCreated={() => {
-            setShowCreate(false);
-            onCreated?.();
-          }}
-        />
+      {canCreate && (
+        <Button
+          onClick={() => setShowCreate(true)}
+          className="rounded-xl"
+        >
+          + Create Project
+        </Button>
       )}
     </div>
-  );
+
+    {/* EMPTY */}
+
+    {projects.length === 0 ? (
+      <div className="border border-dashed border-slate-300 rounded-xl p-8 text-center">
+        <p className="text-slate-500">
+          No projects available yet.
+        </p>
+      </div>
+
+    ) : (
+
+      <div className="space-y-5">
+
+        {projects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            isOwner={isOwner}
+          />
+        ))}
+
+      </div>
+
+    )}
+
+    {/* CREATE MODAL */}
+    {showCreate && (
+      <CreateProjectModal
+        onClose={() => setShowCreate(false)}
+        onCreated={() => {
+          setShowCreate(false);
+          onCreated?.();
+        }}
+      />
+    )}
+
+  </div>
+);
 }

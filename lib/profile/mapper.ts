@@ -1,5 +1,6 @@
 export function mapDeveloperToView(data: any) {
   return {
+    id: data.user.id,
     name: data.user.name,
     image: data.profile.profileImage || "/public/profile.svg",
     subtitle: data.profile.category || "Developer",
@@ -40,6 +41,7 @@ export function mapDeveloperToView(data: any) {
 export function mapFounderToView(data: any) {
   console.log("DATA IN mapFounderToView:", data);
   return {
+    id: data.user.id,
     name: data.user.name,
     image: data.founderProfile.profileImage || "/public/profile.svg",
     subtitle: data.founderProfile.companyName || "Founder",

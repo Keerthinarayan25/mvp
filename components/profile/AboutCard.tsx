@@ -1,10 +1,27 @@
-export default function AboutCard({ bio }: { bio: string }) {
+type Props = {
+  bio: string;
+};
+
+export default function AboutCard({ bio }: Props) {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <h2 className="font-semibold mb-2">About</h2>
-      <p className="text-sm text-gray-600 leading-relaxed">
-        {bio || "No bio added"}
-      </p>
+    <div>
+      <div >
+        <h2 className="text-xl font-semibold text-slate-900">
+          About
+        </h2>
+      </div>
+
+      {bio ? (
+        <p className="text-slate-600 leading-7 whitespace-pre-line">
+          {bio}
+        </p>
+      ) : (
+        <div className="border border-dashed border-slate-300 rounded-xl p-6 text-center">
+          <p className="text-slate-500">
+            No bio added yet.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
