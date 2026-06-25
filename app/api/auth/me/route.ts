@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
     }
 
     // console.log("Auth ME:", user);
+    console.log("USED auth me");
 
     return NextResponse.json({
       id: user.id,

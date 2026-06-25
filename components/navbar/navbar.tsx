@@ -10,7 +10,6 @@ export default function Navbar() {
 
   const { user, loading } = useAuth();
 
-
   if (loading) return null;
 
   return (
