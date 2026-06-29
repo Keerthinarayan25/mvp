@@ -1,27 +1,37 @@
 "use client";
-
-import { useEffect } from "react";
 import { useAuth } from "@/store/useAuth";
+import { useEffect } from "react";
 
 export default function AuthProvider({ children }:
-  { children: React.ReactNode; }) {
-
-  const { user, setUser, } = useAuth();
+  { children: React.ReactNode }) {
+  const { setUser, setLoading } = useAuth();
 
   useEffect(() => {
-    if (user) return;
-
-    fetch("/api/auth/me")
-      .then(res => res.json())
-      .then(data => {
-
-        if (!data.error) {
-          setUser(data);
+    const loadUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (!res.ok) {
+          setUser(null);
+          return;
         }
 
-      });
+        const data = await res.json();
+        if (data.error) {
+          setUser(null);
+          return;
+        }
+        
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+        setUser(null);
 
-  }, [user, setUser]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUser();
+  }, [setUser, setLoading]);
 
-  return <>{children}</>;
+  return <>{children}</>
 }
