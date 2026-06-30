@@ -11,15 +11,19 @@ import HandoffCard from "@/components/contracts/HandoffCard";
 import CancelContractButton from "@/components/contracts/CancelContractButton";
 import FundEscrowButton from "@/components/contracts/FundEscrowButton";
 import UnlockSourceCodeButton from "@/components/contracts/UnlockSourceCodeButton";
+import { connectSocket, getSocket, joinContract, leaveContract } from "@/lib/socket";
 
 
-
-interface Message {
+interface ChatMessage {
   id: number;
-  text: string;
-  senderName: string;
+  contractId: number;
   senderId: number;
-  createdAt: string
+  message: string;
+  createdAt: Date | null;
+  sender: {
+    id: number;
+    name: string;
+  };
 }
 
 export default function ContractPage() {
@@ -27,35 +31,31 @@ export default function ContractPage() {
 
   const { user } = useAuth();
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
-  const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const [contract, setContract] = useState<any>(null);
   const [delivery, setDelivery] = useState<any[]>([]);
   const [handoff, setHandoff] = useState<any>(null);
+  const socketRef = useRef<ReturnType<typeof getSocket> | null>(null);
 
-
-  const fetchMessages = useCallback(async () => {
+  const loadMessages = useCallback(async () => {
     if (!id) return;
 
     try {
       const res = await fetch(`/api/contracts/${id}/messages`);
 
       if (!res.ok) return;
-      const data: Message[] = await res.json();
 
-      setMessages((prev) => {
-        if (prev.length === data.length && prev[prev.length - 1]?.id === data[data.length - 1]?.id) {
-          return prev;
-        }
-        return data;
-      });
+      const data = await res.json();
+
+      setMessages(data);
+
       setLoading(false);
-    } catch {
-
+    } catch (err) {
+      console.error(err);
     }
   }, [id]);
 
@@ -91,29 +91,77 @@ export default function ContractPage() {
     setHandoff(data);
   }, [id]);
 
+
   useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([
+        fetchContract(),
+        fetchDelivery(),
+        loadMessages(),
+        fetchHandoff(),
+      ]);
+    };
 
-    fetchContract();
-    fetchDelivery();
-    fetchMessages();
-    fetchHandoff();
-
-    const interval = setInterval(() => {
-
-      if (document.visibilityState === "visible") {
-        fetchMessages();
-      }
-
-    }, 3000);
-
-    return () => clearInterval(interval);
-
+    loadData();
   }, [
     fetchContract,
     fetchDelivery,
-    fetchMessages,
-    fetchHandoff
+    loadMessages,
+    fetchHandoff,
   ]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function initSocket() {
+      const socket = await connectSocket();
+
+      if (!mounted) return;
+
+      socketRef.current = socket;
+
+      joinContract(Number(id));
+
+      socket.on("joined_contract", ({ room }) => {
+        console.log("Joined:", room);
+      });
+
+      socket.on("new_message", (message: ChatMessage) => {
+        console.log("Received new_message", message);
+
+        setMessages((prev) => {
+          const exists = prev.some((m) => m.id === message.id);
+
+          if (exists) {
+            return prev;
+          }
+
+          return [...prev, message];
+        });
+      });
+
+      socket.on("message_error", (error) => {
+        console.error(error.message);
+      });
+
+      socket.on("contract_error", (error) => {
+        console.error(error.message);
+      });
+    }
+
+    initSocket();
+
+    return () => {
+      mounted = false;
+
+      leaveContract(Number(id));
+
+      socketRef.current?.off("joined_contract");
+      socketRef.current?.off("new_message");
+      socketRef.current?.off("message_error");
+      socketRef.current?.off("contract_error");
+    };
+  }, [id]);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -127,60 +175,38 @@ export default function ContractPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     const trimmed = text.trim();
-    if (!trimmed || sending) return;
 
-    setSending(true);
+    if (!trimmed) return;
+    console.log("Sending message...", trimmed);
 
-    const tempMessage: Message = {
-      id: Date.now(),
-      text: trimmed,
-      senderId: currentUserId || 0,
-      senderName: "You",
-      createdAt: new Date().toISOString(),
-    };
+    console.log("Socket:", socketRef.current);
+    console.log("Connected:", socketRef.current?.connected);
+    console.log("Socket ID:", socketRef.current?.id);
 
-    setMessages((prev) => [...prev, tempMessage]);
+    socketRef.current?.emit("send_message", {
+      contractId: Number(id),
+      message: trimmed,
+    });
+
     setText("");
-
-    try {
-
-      await fetch(`/api/contracts/${id}/messages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contractId: id,
-          messageText: trimmed,
-        }),
-      });
-
-      fetchMessages();
-    } catch {
-      setMessages((prev) => prev.slice(0, -1));
-      setText(trimmed);
-    } finally {
-      setSending(false);
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") sendMessage();
   };
 
-  const formatTime = (iso: string) =>
-    new Date(iso).toLocaleTimeString([], {
+  const formatTime = (date: Date | null) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
 
-  console.log("USER", user);
-
-  console.log("CONTRACT", contract);
-
-  console.log("DELIVERY", delivery);
+  
 
   return (
     <div className="max-w-5xl mx-auto mt-10 border rounded-xl shadow bg-white overflow-hidden">
@@ -208,8 +234,8 @@ export default function ContractPage() {
                 return (
                   <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-xs px-3 py-2 rounded-lg ${isMe ? "bg-black text-white" : "bg-white border"}`}>
-                      {!isMe && <p className="text-xs font-semibold">{msg.senderName}</p>}
-                      <p>{msg.text}</p>
+                      {!isMe && <p className="text-xs font-semibold">{msg.sender.name}</p>}
+                      <p>{msg.message}</p>
                       <p className="text-[10px] mt-1 opacity-70 text-right">{formatTime(msg.createdAt)}</p>
                     </div>
                   </div>
@@ -267,7 +293,7 @@ export default function ContractPage() {
                 )}
 
               <div className="space-y-4">
-                {delivery.map((d: any) => <DeliveryCard key={d.id} delivery={d} />)}
+                {delivery.map((d) => <DeliveryCard key={d.id} delivery={d} />)}
               </div>
 
               {handoff && <HandoffCard handoff={handoff} />}

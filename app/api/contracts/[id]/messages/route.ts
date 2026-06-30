@@ -54,20 +54,31 @@ export async function GET(req: NextRequest, { params }: {
       );
     }
 
-    const msgs = await db
+    const rows = await db
       .select({
         id: messages.id,
-        text: messages.message_text,
+        contractId: messages.contractId,
+        senderId: messages.senderId,
+        message: messages.message_text,
         createdAt: messages.createdAt,
-        senderId: users.id,
         senderName: users.name,
       })
       .from(messages)
-      .innerJoin(users, eq(messages.senderId, users.id)
-      )
+      .innerJoin(users, eq(messages.senderId, users.id))
       .where(eq(messages.contractId, contractId))
-      .orderBy(asc(messages.createdAt)
-      );
+      .orderBy(asc(messages.createdAt));
+
+    const msgs = rows.map((row) => ({
+      id: row.id,
+      contractId: row.contractId,
+      senderId: row.senderId,
+      message: row.message,
+      createdAt: row.createdAt,
+      sender: {
+        id: row.senderId,
+        name: row.senderName,
+      },
+    }));
 
     return NextResponse.json(msgs);
 
@@ -83,91 +94,3 @@ export async function GET(req: NextRequest, { params }: {
   }
 }
 
-
-export async function POST(req: NextRequest, { params, }: {
-  params: Promise<{ id: string }>;
-}
-) {
-  try {
-
-    const token = req.cookies.get("token")?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { error: "Unauthorized", },
-        { status: 401, }
-      );
-    }
-
-    const user = verifyToken(token);
-
-    const { id } = await params;
-
-    const contractId = Number(id);
-
-    if (isNaN(contractId)) {
-      return NextResponse.json(
-        { error: "Invalid Contract ID", },
-        { status: 400, }
-      );
-    }
-
-
-
-    const contract = await db.query.contracts.findFirst(
-      {
-        where: eq(contracts.id, contractId),
-      }
-    );
-
-
-    if (!contract) {
-      return NextResponse.json(
-        { error: "Contract not found", },
-        { status: 404, }
-      );
-    }
-
-    
-    const isParticipant = contract.founderId === user.id ||
-      contract.developerId === user.id;
-
-    if (!isParticipant) {
-      return NextResponse.json(
-        { error: "Forbidden", },
-        { status: 403, }
-      );
-    }
-
-    const body = await req.json();
-
-    if (!body.messageText || !body.messageText.trim()
-    ) {
-      return NextResponse.json(
-        { error: "Message required", },
-        { status: 400, }
-      );
-    }
-
-    const newMessage =
-      await db
-        .insert(messages)
-        .values({
-          contractId,
-          senderId: user.id,
-          message_text: body.messageText.trim(),
-        })
-        .returning();
-
-    return NextResponse.json(newMessage[0]);
-
-  } catch (error) {
-
-    console.error("POST MESSAGE ERROR:", error);
-
-    return NextResponse.json(
-      { error: "Failed to send message", },
-      { status: 500, }
-    );
-  }
-}

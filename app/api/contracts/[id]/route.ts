@@ -65,10 +65,10 @@ export async function GET(req: NextRequest, { params,
       ),
     });
 
-  console.log("CONTRACT, PROJECT, FOUNDER, DEVELOPER", contract,
-    project,
-    founder,
-    developer,);
+  // console.log("CONTRACT, PROJECT, FOUNDER, DEVELOPER", contract,
+  //   project,
+  //   founder,
+  //   developer,);
 
   return NextResponse.json({
     contract,
